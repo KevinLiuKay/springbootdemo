@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.kevin.dao.extMapper.sys.SysLogExtMapper">
+	
+    <resultMap id="extMap" type="com.kevin.model.ext.sys.SysLogExt" extends="com.kevin.dao.mapper.SysLogMapper.BaseResultMap">
+		<association property="sysUser" column="USER_ID"  resultMap="com.kevin.dao.mapper.SysUserMapper.BaseResultMap" />
+	</resultMap>
+
+	<select id="querySysLogExtList" parameterType="java.util.Map" resultMap ="extMap">
+	    select 
+	    	l.LOG_ID, l.LOG_TYPE_ID, l.LOG_DETAIL, L.CREATE_TIME,
+	    	u.USER_ID, u.USER_NAME
+	    from SYS_LOG l
+	    inner join SYS_USER u on l.CREATE_USER_ID = u.USER_ID 
+	    where l.RECORD_STATE = 'Y' and u.RECORD_STATE = 'Y'
+	    <if test="sysLog != null">
+			<if test="sysLog.logTypeId != null and sysLog.logTypeId != '' ">
+				and l.LOG_TYPE_ID = #{sysLog.logTypeId}
+			</if>
+		</if>
+	    order by l.CREATE_TIME DESC
+	</select>
+	
+</mapper>

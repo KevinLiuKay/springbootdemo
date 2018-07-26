@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.kevin.dao.mapper.SysCfgMapper" >
+  <resultMap id="BaseResultMap" type="com.kevin.model.SysCfg" >
+    <id column="cfg_code" property="cfgCode" jdbcType="VARCHAR" />
+    <result column="cfg_value" property="cfgValue" jdbcType="VARCHAR" />
+    <result column="cfg_desc" property="cfgDesc" jdbcType="VARCHAR" />
+    <result column="ws_id" property="wsId" jdbcType="VARCHAR" />
+    <result column="ws_name" property="wsName" jdbcType="VARCHAR" />
+    <result column="record_state" property="recordState" jdbcType="VARCHAR" />
+    <result column="create_user_id" property="createUserId" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_user_id" property="updateUserId" jdbcType="VARCHAR" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    cfg_code, cfg_value, cfg_desc, ws_id, ws_name, record_state, create_user_id, create_time, 
+    update_user_id, update_time
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.kevin.model.SysCfgExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from sys_cfg
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from sys_cfg
+    where cfg_code = #{cfgCode,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from sys_cfg
+    where cfg_code = #{cfgCode,jdbcType=VARCHAR}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.kevin.model.SysCfgExample" >
+    delete from sys_cfg
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.kevin.model.SysCfg" >
+    insert into sys_cfg (cfg_code, cfg_value, cfg_desc, 
+      ws_id, ws_name, record_state, 
+      create_user_id, create_time, update_user_id, 
+      update_time)
+    values (#{cfgCode,jdbcType=VARCHAR}, #{cfgValue,jdbcType=VARCHAR}, #{cfgDesc,jdbcType=VARCHAR}, 
+      #{wsId,jdbcType=VARCHAR}, #{wsName,jdbcType=VARCHAR}, #{recordState,jdbcType=VARCHAR}, 
+      #{createUserId,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateUserId,jdbcType=VARCHAR}, 
+      #{updateTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.kevin.model.SysCfg" >
+    insert into sys_cfg
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="cfgCode != null" >
+        cfg_code,
+      </if>
+      <if test="cfgValue != null" >
+        cfg_value,
+      </if>
+      <if test="cfgDesc != null" >
+        cfg_desc,
+      </if>
+      <if test="wsId != null" >
+        ws_id,
+      </if>
+      <if test="wsName != null" >
+        ws_name,
+      </if>
+      <if test="recordState != null" >
+        record_state,
+      </if>
+      <if test="createUserId != null" >
+        create_user_id,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateUserId != null" >
+        update_user_id,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="cfgCode != null" >
+        #{cfgCode,jdbcType=VARCHAR},
+      </if>
+      <if test="cfgValue != null" >
+        #{cfgValue,jdbcType=VARCHAR},
+      </if>
+      <if test="cfgDesc != null" >
+        #{cfgDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="wsId != null" >
+        #{wsId,jdbcType=VARCHAR},
+      </if>
+      <if test="wsName != null" >
+        #{wsName,jdbcType=VARCHAR},
+      </if>
+      <if test="recordState != null" >
+        #{recordState,jdbcType=VARCHAR},
+      </if>
+      <if test="createUserId != null" >
+        #{createUserId,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateUserId != null" >
+        #{updateUserId,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.kevin.model.SysCfgExample" resultType="java.lang.Integer" >
+    select count(*) from sys_cfg
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update sys_cfg
+    <set >
+      <if test="record.cfgCode != null" >
+        cfg_code = #{record.cfgCode,jdbcType=VARCHAR},
+      </if>
+      <if test="record.cfgValue != null" >
+        cfg_value = #{record.cfgValue,jdbcType=VARCHAR},
+      </if>
+      <if test="record.cfgDesc != null" >
+        cfg_desc = #{record.cfgDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="record.wsId != null" >
+        ws_id = #{record.wsId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.wsName != null" >
+        ws_name = #{record.wsName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.recordState != null" >
+        record_state = #{record.recordState,jdbcType=VARCHAR},
+      </if>
+      <if test="record.createUserId != null" >
+        create_user_id = #{record.createUserId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.createTime != null" >
+        create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.updateUserId != null" >
+        update_user_id = #{record.updateUserId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.updateTime != null" >
+        update_time = #{record.updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update sys_cfg
+    set cfg_code = #{record.cfgCode,jdbcType=VARCHAR},
+      cfg_value = #{record.cfgValue,jdbcType=VARCHAR},
+      cfg_desc = #{record.cfgDesc,jdbcType=VARCHAR},
+      ws_id = #{record.wsId,jdbcType=VARCHAR},
+      ws_name = #{record.wsName,jdbcType=VARCHAR},
+      record_state = #{record.recordState,jdbcType=VARCHAR},
+      create_user_id = #{record.createUserId,jdbcType=VARCHAR},
+      create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      update_user_id = #{record.updateUserId,jdbcType=VARCHAR},
+      update_time = #{record.updateTime,jdbcType=TIMESTAMP}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.kevin.model.SysCfg" >
+    update sys_cfg
+    <set >
+      <if test="cfgValue != null" >
+        cfg_value = #{cfgValue,jdbcType=VARCHAR},
+      </if>
+      <if test="cfgDesc != null" >
+        cfg_desc = #{cfgDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="wsId != null" >
+        ws_id = #{wsId,jdbcType=VARCHAR},
+      </if>
+      <if test="wsName != null" >
+        ws_name = #{wsName,jdbcType=VARCHAR},
+      </if>
+      <if test="recordState != null" >
+        record_state = #{recordState,jdbcType=VARCHAR},
+      </if>
+      <if test="createUserId != null" >
+        create_user_id = #{createUserId,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateUserId != null" >
+        update_user_id = #{updateUserId,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where cfg_code = #{cfgCode,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.kevin.model.SysCfg" >
+    update sys_cfg
+    set cfg_value = #{cfgValue,jdbcType=VARCHAR},
+      cfg_desc = #{cfgDesc,jdbcType=VARCHAR},
+      ws_id = #{wsId,jdbcType=VARCHAR},
+      ws_name = #{wsName,jdbcType=VARCHAR},
+      record_state = #{recordState,jdbcType=VARCHAR},
+      create_user_id = #{createUserId,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_user_id = #{updateUserId,jdbcType=VARCHAR},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where cfg_code = #{cfgCode,jdbcType=VARCHAR}
+  </update>
+</mapper>

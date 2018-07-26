@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.kevin.dao.extMapper.sys.SysDictExtMapper">
+    
+	<!-- 排序码批量+1 -->
+	<update id="setSortKeyAddOne" parameterType="java.util.Map" >
+	    update SYS_DICT
+	    set SORT_KEY = SORT_KEY + 1, MODIFY_USER_ID = #{currUserId}, MODIFY_TIME = sysdate() 
+		where RECORD_STATE = 'Y' and DICT_TYPE_ID = #{dictTypeId}
+		and SORT_KEY >= #{oldSortKey}
+		and SORT_KEY <![CDATA[<]]> #{currSortKey}
+	</update>
+	
+	<!-- 排序码批量-1 -->
+	<update id="setSortKeySubOne" parameterType="java.util.Map">
+	    update SYS_DICT
+	    set SORT_KEY = SORT_KEY - 1, MODIFY_USER_ID = #{currUserId}, MODIFY_TIME = sysdate()
+		where RECORD_STATE = 'Y' and DICT_TYPE_ID = #{dictTypeId}
+		and SORT_KEY > #{currSortKey}
+		and SORT_KEY <![CDATA[<]]>= #{oldSortKey}
+	</update>
+	
+	<!-- maxSortKey -->
+	<select id="maxSortKey" parameterType="com.kevin.model.SysDict" resultType="int">
+		select 
+			IFNULL(max(SORT_KEY), 0)
+		from SYS_DICT
+		where RECORD_STATE = 'Y'
+		and DICT_TYPE_ID = #{dictTypeId}
+	</select>
+	
+	<!-- 批量修改   成功 返回值为-1，而不是影响行数-->
+	<!-- 
+		index：下标
+		item：每个元素的名称，名称随意定义
+		open：循环开始
+		close：循环结束
+		separator：中间分隔输出 
+	 -->
+	<update id="saveSort" parameterType="java.util.Map">
+        <foreach collection="dictId" item="item" index="index" separator=";" >
+            update SYS_DICT
+            <set>
+            	SORT_KEY = #{firstSerialNum} + #{index} + 1, 
+            	MODIFY_USER_ID = #{currUserId}, 
+            	MODIFY_TIME = sysdate()
+            </set>
+            where DICT_ID = #{item}
+        </foreach>
+	</update>
+  	
+</mapper>
