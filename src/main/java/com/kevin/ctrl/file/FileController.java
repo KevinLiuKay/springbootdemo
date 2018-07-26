@@ -1,21 +1,30 @@
 package com.kevin.ctrl.file;
 
+import com.github.pagehelper.PageHelper;
+import com.kevin.common.GlobalConstant.GlobalConstant;
+import com.kevin.common.core.HttpServletContext;
+import com.kevin.common.utils.ExcelUtil;
+import com.kevin.common.utils.ExportUtil;
+import com.kevin.common.utils.JsonResult;
+import com.kevin.exception.CommonException;
+import com.kevin.model.SysUser;
+import com.kevin.model.ext.sys.SysUserExt;
+import com.kevin.service.sys.ISysUserService;
+import com.sun.xml.internal.messaging.saaj.util.ByteInputStream;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import org.apache.commons.io.IOUtils;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
-
 import javax.servlet.http.HttpServletRequest;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import javax.servlet.http.HttpServletResponse;
+import java.io.*;
 import java.util.List;
 
 @RestController
@@ -23,6 +32,12 @@ import java.util.List;
 @Api(value = "fileManage", tags = "fileManage")
 public class FileController {
     private static final Logger logger = LoggerFactory.getLogger(FileController.class);
+
+    protected static Object[] USER_PARAMS = {"userName","userAcc","userGender","userPhone","userAddr"};
+    protected static String[] USER_PARAMNAMES = new String[]{"用户名","用户账号","性别","手机号","地址"};
+    protected static String USER_NAME = "用户列表";
+    @Autowired
+    private ISysUserService sysUserService;
 
     @ApiOperation(value = "单个附件上传", notes = "单个附件上传", code = 200, produces = "application/json")
     @RequestMapping(value = "/upload", method = RequestMethod.POST)
@@ -83,4 +98,46 @@ public class FileController {
         }
         return "上传成功";
     }
+
+    @RequestMapping(value = "/excelModelDownload",method = {RequestMethod.GET, RequestMethod.POST})
+    @ApiOperation(value = "springbootExcel模板下载", notes = "springbootExcel模板下载", code = 200, produces = "application/json")
+    public JsonResult modelDownload(HttpServletRequest request, HttpServletResponse response) {
+        JsonResult jsonResult = new JsonResult();
+        jsonResult.setStatus(false);
+        jsonResult.setMessage(GlobalConstant.UPLOAD_FAIL);
+        try {
+            response.setContentType("application/octet-stream;charset=iso-8859-1");
+            response.setHeader("Content-Disposition", String.format("attachment; filename=\"%s\"", new String("springbootExcel.xls".getBytes("gb2312"), "iso-8859-1" )));
+            InputStream myStream = this.getClass().getResourceAsStream("/static/download/springbootExcel.xls");
+            IOUtils.copy(myStream, response.getOutputStream());
+            // 客户端不缓存
+            response.addHeader("Pargam", "no-cache");
+            response.addHeader("Cache-Control", "no-cache");
+            response.getOutputStream().flush();
+            response.getOutputStream().close();
+            jsonResult.setStatus(true);
+            jsonResult.setMessage(GlobalConstant.UPLOAD_SUCCESSED);
+        } catch (Exception e) {
+            e.printStackTrace();
+            jsonResult.setMessage(GlobalConstant.UPLOAD_FAIL);
+        }
+        return jsonResult;
+    }
+
+
+    @RequestMapping(value = "/exportUserListExcel",method = {RequestMethod.GET, RequestMethod.POST})
+    @ApiOperation(value = "导出用户表信息Excel", notes = "导出用户表信息Excel", code = 200, produces = "application/json")
+    public void exportUserListExcel(SysUser sysUser,
+                           @ApiParam(name = "pageNum",value = "当前页", required = false) @RequestParam(name = "pageNum", required = false, defaultValue = "1") Integer pageNum,
+                           @ApiParam(name = "pageSize",value = "每页的条数", required = false) @RequestParam(name = "pageSize", required = false, defaultValue = "10") Integer pageSize){
+        //获取数据
+        PageHelper.startPage(pageNum, pageSize);
+        List<SysUser> userList = sysUserService.queryList(sysUser,"create_time asc");
+        ExportUtil.BookResult result = ExportUtil.exportDataInObj(userList, USER_PARAMS,USER_PARAMNAMES);
+        result.getErrorInfo();
+        HttpServletResponse response = HttpServletContext.getResponse();
+        ExportUtil.exportExcel(response, result.getWorkBook(), USER_NAME);
+    }
+
+
 }

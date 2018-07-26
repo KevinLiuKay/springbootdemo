@@ -1,5 +1,4 @@
 package com.kevin;
-//
 import com.alibaba.druid.pool.DruidDataSource;
 import com.alibaba.druid.support.http.StatViewServlet;
 import com.alibaba.druid.support.http.WebStatFilter;
@@ -19,7 +18,7 @@ public class DruidConfiguration {
     @Bean(destroyMethod = "close", initMethod = "init")
     @ConfigurationProperties(prefix = "spring.datasource")
     public DataSource druidDataSource() {
-        DruidDataSource  druidDataSource = new DruidDataSource();
+        DruidDataSource druidDataSource = new DruidDataSource();
         return druidDataSource;
     }
 

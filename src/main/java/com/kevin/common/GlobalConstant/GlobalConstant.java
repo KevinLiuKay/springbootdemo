@@ -206,6 +206,9 @@ public class GlobalConstant {
 	public static final String UPLOAD_SUCCESSED = "上传成功！";
 	public static final String UPLOAD_FAIL = "上传失败！";
 
+	public static final String EXPORT_SUCCESSED = "导出成功！";
+	public static final String EXPORT_FAIL = "上传失败！";
+
 	public static final String SORT_SUCCESSED = "排序成功！";
 	public static final String SORT_FAIL = "排序失败！";
 
@@ -314,7 +317,7 @@ public class GlobalConstant {
 	//超级管理员  主键
 	public static final String ROOT_USER_ID = "00000000000000000000000000000000";
 	//超级管理员  密码
-	public static final String ROOT_PASSWORD = "Rxmes_2018";
+	public static final String ROOT_PASSWORD = "123456";
 
 	//*********************  排序字段   !  *******************************
 
