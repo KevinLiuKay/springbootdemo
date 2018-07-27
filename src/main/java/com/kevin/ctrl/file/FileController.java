@@ -73,30 +73,33 @@ public class FileController {
 
     @ApiOperation(value = "多个附件上传", notes = "多个附件上传", code = 200, produces = "application/json")
     @RequestMapping(value = "/batchUpload", method = RequestMethod.POST)
-    public String batchUpload(HttpServletRequest request, MultipartFile[] f) {
+    public String batchUpload(HttpServletRequest request) {
         List<MultipartFile> files = ((MultipartHttpServletRequest) request).getFiles("file");
         MultipartFile file = null;
         BufferedOutputStream stream = null;
-        for (int i = 0; i < files.size(); ++i) {
-            file = files.get(i);
-            String filePath = "D://testFileUpload//";
-            if (!file.isEmpty()) {
-                try {
-                    byte[] bytes = file.getBytes();
-                    stream = new BufferedOutputStream(new FileOutputStream(
-                            new File(filePath + file.getOriginalFilename())));//设置文件路径及名字
-                    stream.write(bytes);// 写入
-                    stream.close();
+        if(files != null && !files.isEmpty()){
+            for (int i = 0; i < files.size(); ++i) {
+                file = files.get(i);
+                String filePath = "D://testFileUpload//";
+                if (!file.isEmpty()) {
+                    try {
+                        byte[] bytes = file.getBytes();
+                        stream = new BufferedOutputStream(new FileOutputStream(
+                                new File(filePath + file.getOriginalFilename())));//设置文件路径及名字
+                        stream.write(bytes);// 写入
+                        stream.close();
 
-                } catch (Exception e) {
-                    stream = null;
-                    return "第 " + i + " 个文件上传失败 ==> " + e.getMessage();
+                    } catch (Exception e) {
+                        stream = null;
+                        return "第 " + i + " 个文件上传失败 ==> " + e.getMessage();
+                    }
+                } else {
+                    return "第 " + i + " 个文件上传失败因为文件为空";
                 }
-            } else {
-                return "第 " + i + " 个文件上传失败因为文件为空";
             }
+            return "上传成功";
         }
-        return "上传成功";
+        return "上传附件为空";
     }
 
     @RequestMapping(value = "/excelModelDownload",method = {RequestMethod.GET, RequestMethod.POST})
@@ -124,7 +127,24 @@ public class FileController {
         return jsonResult;
     }
 
-
+    @RequestMapping(value = "/importUser" ,method = RequestMethod.POST)
+    @ApiOperation(value = "导入用户表", notes = "导入用户表", code = 200, produces = "application/json")
+    public JsonResult importUser(
+            @ApiParam(name = "file", required = false) @RequestParam("file") MultipartFile file) {
+        JsonResult jsonResult = new JsonResult();
+        jsonResult.setStatus(false);
+        if (file != null) {
+            try {
+                jsonResult.setStatus(true);
+                jsonResult.setModel(sysUserService.batchInsertUserByExcel(file));
+            } catch (Exception e) {
+                logger.debug("-----> Exception : " + e.getMessage());
+                jsonResult.setStatus(false);
+                jsonResult.setMessage(GlobalConstant.EXCEPTION_MSG + "_" + e.getMessage());
+            }
+        }
+        return jsonResult;
+    }
     @RequestMapping(value = "/exportUserListExcel",method = {RequestMethod.GET, RequestMethod.POST})
     @ApiOperation(value = "导出用户表信息Excel", notes = "导出用户表信息Excel", code = 200, produces = "application/json")
     public void exportUserListExcel(SysUser sysUser,

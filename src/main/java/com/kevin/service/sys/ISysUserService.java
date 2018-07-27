@@ -2,9 +2,10 @@ package com.kevin.service.sys;
 
 import com.kevin.model.SysUser;
 import com.kevin.service.ICommonService;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-
+import java.util.Map;
 public interface ISysUserService extends ICommonService<SysUser> {
     /**
      * 超级管理员 首次创建
@@ -25,7 +26,29 @@ public interface ISysUserService extends ICommonService<SysUser> {
      * @param sysUser
      * @return
      */
-    public List<SysUser> checkUnique(SysUser sysUser);
+    public long checkUnique(SysUser sysUser);
+
+    /**
+     * 批量插入用户
+     * @param list
+     * @return
+     */
+    int batchInsert(List<SysUser> list);
+
+    /**
+     * 批量逻辑删除用户
+     * @param list
+     * @return
+     */
+    int batchLogicDelete(List<String> list);
+
+    /**
+     * 从Excel批量导入用户
+     * @param file
+     * @return
+     * @throws Exception
+     */
+    public Map<String, Object> batchInsertUserByExcel(MultipartFile file) throws Exception;
 
     /**********************************ehcache缓存*******************************************/
     /**

@@ -50,8 +50,11 @@ public class HttpServletContext {
 	}
 
 	public static SysUser getCurrentUser() {
-		if (null == getSession()) {
-			return null;
+		if (null != getSession()) {
+			SysUser sessionUser = (SysUser) getSession().getAttribute(GlobalConstant.CURR_USER);
+			if(sessionUser != null) {
+				return sessionUser;
+			}
 		}
 		//获取当前的Subject
 		Subject currentUser = SecurityUtils.getSubject();

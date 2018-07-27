@@ -80,7 +80,7 @@ public class LoginController extends CommonController {
 //        redisUtil.set("currUser", currUser);
 //        SysUser setRedisCurrUser = (SysUser)redisUtil.get("currUser");
 //        logger.debug("-------------redis缓存中获取当前用户信息:--------------------" + setRedisCurrUser.getUserName() + setRedisCurrUser.getUserAcc());
-//        userService.cacheable(currUser.getUserId());
+        userService.cacheable(currUser.getUserId());
         setSessionAttribute(GlobalConstant.CURR_USER, currUser);
         /**
          * 记录日志

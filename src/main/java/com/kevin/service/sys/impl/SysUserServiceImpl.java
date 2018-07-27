@@ -2,37 +2,49 @@ package com.kevin.service.sys.impl;
 
 import com.kevin.common.GlobalConstant.GlobalConstant;
 import com.kevin.common.core.GeneralMethod;
+import com.kevin.common.core.HttpServletContext;
 import com.kevin.common.shiro.PasswordHelper;
 import com.kevin.common.utils.ExcelUtil;
 import com.kevin.common.utils.UUIDUtil;
+import com.kevin.dao.extMapper.sys.SysUserExtMapper;
 import com.kevin.dao.mapper.SysUserMapper;
 import com.kevin.exception.CommonException;
 import com.kevin.model.SysUser;
 import com.kevin.model.SysUserExample;
+import com.kevin.service.pub.IFileService;
 import com.kevin.service.sys.ISysUserService;
 import com.sun.xml.internal.messaging.saaj.util.ByteInputStream;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-
+import javax.annotation.Resource;
 import java.io.InputStream;
-import java.util.Calendar;
-import java.util.List;
+import java.util.*;
+
 @Service
 @Transactional(rollbackFor = Exception.class)
 public class SysUserServiceImpl implements ISysUserService {
     private static Logger logger = LoggerFactory.getLogger(SysUserServiceImpl.class);
 
-    @Autowired
+    @Resource
     private SysUserMapper sysUserMapper;
+    @Resource
+    private SysUserExtMapper sysUserExtMapper;
+    @Resource
+    private IFileService fileService;
 
 //    @Autowired
 //    private RedisUtil redisUtil;
@@ -76,7 +88,7 @@ public class SysUserServiceImpl implements ISysUserService {
     @Override
 //    @Cacheable(value = "currUser",key="'sysUser_'+#sysUser.getUserId()")
     public List<SysUser> queryList(SysUser sysUser, String orderByClause) {
-        System.err.println("没有走缓存！"+sysUser.getUserId());
+//        System.err.println("没有走缓存！"+sysUser.getUserId());
 //        SysUser setRedisCurrUser = (SysUser)redisUtil.get("currUser");
 //        logger.debug("-------------redis缓存中获取当前用户信息:--------------------" + setRedisCurrUser.getUserName() + setRedisCurrUser.getUserAcc());
         SysUserExample example = new SysUserExample();
@@ -136,25 +148,85 @@ public class SysUserServiceImpl implements ISysUserService {
     }
 
     @Override
-    public List<SysUser> checkUnique(SysUser sysUser) {
+    public long checkUnique(SysUser sysUser) {
         SysUserExample example = new SysUserExample();
         SysUserExample.Criteria criteria = example.createCriteria().andRecordStateEqualTo(GlobalConstant.Y);
+        SysUserExample.Criteria criteria2 = example.createCriteria().andRecordStateEqualTo(GlobalConstant.Y);
         if (StringUtils.isNotBlank(sysUser.getUserAcc())) {
             criteria.andUserAccEqualTo(sysUser.getUserAcc());
         }
         if (StringUtils.isNotBlank(sysUser.getUserPhone())) {
-            criteria.andUserPhoneEqualTo(sysUser.getUserPhone());
+            criteria2.andUserPhoneEqualTo(sysUser.getUserPhone());
         }
-        //非自己！！
-        if (sysUser.getUserId() != null) {
+        //非自己！
+        if (StringUtils.isNotBlank(sysUser.getUserId())) {
             criteria.andUserIdNotEqualTo(sysUser.getUserId());
+            criteria2.andUserIdNotEqualTo(sysUser.getUserId());
         }
-        List<SysUser> sysUserList = sysUserMapper.selectByExample(example);
-        if (sysUserList != null && !sysUserList.isEmpty()) {
-            return sysUserList;
+        example.or(criteria2);
+        return sysUserMapper.countByExample(example);
+    }
+
+    @Override
+    public int batchInsert(List<SysUser> list) {
+        if(list != null && !list.isEmpty()) {
+            return sysUserExtMapper.batchInsert(list);
+        }
+        return 0;
+    }
+
+    @Override
+    public int batchLogicDelete(List<String> list) {
+        if(list != null && !list.isEmpty()) {
+            SysUser currentUser = HttpServletContext.getCurrentUser();
+            Date currentTime = Calendar.getInstance().getTime();
+            Map<String, Object> map = new HashMap<String, Object>();
+            map.put("updateTime", currentTime);
+            map.put("updateUserId", currentUser.getUserId());
+            map.put("recordState", GlobalConstant.N);
+            map.put("list", list);
+            return sysUserExtMapper.batchLogicDelete(map);
+        }
+        return 0;
+    }
+
+    @Override
+    public Map<String, Object> batchInsertUserByExcel(MultipartFile file) throws Exception{
+        Map<String, Object> resultMap = new HashMap<>();
+        /*
+         * 允许上传Excel的MIME类型、后缀、大小
+         */
+        String acceptMessage = fileService.acceptExcel(file);
+        if (!GlobalConstant.Y.equals(acceptMessage)) {
+            resultMap.put("acceptMessage", acceptMessage);
+            return resultMap;
+        }
+        //将上传文件解析为工作簿
+        Workbook wb = parseFileToWorkbook(file);
+        // 从工作簿中对象封装为对应的List
+        List<SysUser> userListByExcel = workbookEncapIntoList(wb);
+        //保存Excel中获取List
+        SysUser currentUser = HttpServletContext.getCurrentUser();
+        Date currentTime = Calendar.getInstance().getTime();
+        PasswordHelper passwordHelper = new PasswordHelper();
+        if (userListByExcel != null && !userListByExcel.isEmpty()) {
+            for (SysUser sysUser : userListByExcel) {
+                String userId = UUIDUtil.getUUID();
+                sysUser.setUserId(userId);
+                String pwd = passwordHelper.encryptPassword(userId,GlobalConstant.ROOT_PASSWORD);
+                sysUser.setUserPwd(pwd);
+                if(currentUser != null) {
+                    sysUser.setCreateUserId(currentUser.getUserId());
+                    sysUser.setCreateTime(currentTime);
+                }
+                sysUser.setRecordState(GlobalConstant.Y);
+            }
+            int result = batchInsert(userListByExcel);
+            resultMap.put("result", result);
         }
         return null;
     }
+
 
     @Override
     @CachePut(value = "currUser", key = "#sysUser.userId")
@@ -212,10 +284,10 @@ public class SysUserServiceImpl implements ISysUserService {
      * @throws Exception
      */
 
-	/*private List<MngProcessRoute> workbookEncapIntoList(Workbook wb) {
+	private List<SysUser> workbookEncapIntoList(Workbook wb) {
 		int sheetNum = wb.getNumberOfSheets();// workbook中的sheet数
 		if (sheetNum > 0) {
-			List<MngProcessRoute> processRouteList = new ArrayList<>();
+			List<SysUser> userList = new ArrayList<>();
 			Sheet sheet;
 			try {
 				sheet = (HSSFSheet) wb.getSheetAt(0);// 得到第一个sheet（以excel的版本来分别）
@@ -224,160 +296,54 @@ public class SysUserServiceImpl implements ISysUserService {
 			}
 			int row_num = sheet.getLastRowNum(); // excel的总行数
 			for (int i = 1; i <= row_num; i++) {// 读取每行
-				// -----单元格begin------
-				Row r = sheet.getRow(i);
-				int cell_num = 11;// 定死列数 防止读其他空的列
-				MngProcessRoute addRoute = new MngProcessRoute();
-				MngWorkProcess workProcess = new MngWorkProcess(); // 工序
-				MngWorkCenter serchCenter = new MngWorkCenter();
+                // -----单元格begin------
+                Row r = sheet.getRow(i);
+                int cell_num = 5;// 定死列数 防止读其他空的列
+                SysUser sysUser = new SysUser();
+                String key = GlobalConstant.EMPTY;
+                for (int j = 0; j < cell_num; j++) {// 遍历一行每列
+                    String value = "";
+                    Cell cell = r.getCell((short) j);
+                    if (cell == null) {
+                        continue;
+                    }
+                    cell.setCellType(HSSFCell.CELL_TYPE_STRING);
+                    if (cell.getCellType() == HSSFCell.CELL_TYPE_STRING) {
+                        value = r.getCell((short) j).getStringCellValue();// 将cell中的值付给value
+                    } else {
+                        value = ExcelUtil._doubleTrans(r.getCell((short) j).getNumericCellValue());
+                    }
+                    // Excel数据封装成java对象
+                    value = value.trim();
+                    logger.debug("第" + i + "行" + (j + 1) + "列：" + value);
+                    if (j == 0) {
+                        sysUser.setUserName(value);
+                    } else if (j == 1) {
+                        sysUser.setUserAcc(value);
+                    } else if (j == 2) {
+                        sysUser.setUserGender(Integer.valueOf(value));
+                    } else if (j == 3) {
+                        sysUser.setUserPhone(value);
+                    } else if (j == 4) {
+                        sysUser.setUserAddr(value);
+                    }
 
-				MngInspectRequire inspectRequire = new MngInspectRequire(); // 检验要求
-
-				MngWorkProcessMaterial processMaterial = new MngWorkProcessMaterial(); // 资源(物料)
-				MngMaterial search = new MngMaterial();
-				MngMaterialType searchType = new MngMaterialType();
-				MngMaterialVersion searchVersion = new MngMaterialVersion();
-
-				MngWorkProcessEquip processEquip = new MngWorkProcessEquip(); // 设备
-				MngEquip serchEquip = new MngEquip();
-
-				String key = GlobalConstant.EMPTY;
-				for (int j = 0; j < cell_num; j++) {// 遍历一行每列
-					String value = "";
-					Cell cell = r.getCell((short) j);
-					if (cell == null) {
-						continue;
-					}
-					cell.setCellType(HSSFCell.CELL_TYPE_STRING);
-					if (cell.getCellType() == HSSFCell.CELL_TYPE_STRING) {
-						value = r.getCell((short) j).getStringCellValue();// 将cell中的值付给value
-					} else {
-						value = ExcelUtil._doubleTrans(r.getCell((short) j).getNumericCellValue());
-					}
-
-					// Excel数据封装成java对象
-					value = value.trim();
-					logger.debug("第" + i + "行" + (j + 1) + "列：" + value);
-
-					if (j == 0) {
-					} else if (j == 1) {
-						workProcess.setProcessCode(value);
-					} else if (j == 2) {
-						workProcess.setProcessName(value);
-					} else if (j == 3) {
-						serchCenter.setWorkCenterName(value); // 工作中心
-					} else if (j == 4) {
-						workProcess.setPersionQualify(value);
-					} else if (j == 5) {
-						inspectRequire.setInspectType(Integer.valueOf(value));
-					} else if (j == 6) {
-						inspectRequire.setRequirement(value);
-					} else if (j == 7) {
-						inspectRequire.setRequireParam(value);
-					} else if (j == 8) {
-						search.setMaterialName(value); // 物料名称
-					} else if (j == 9) {
-						search.setMaterialCode(value); // 物料编码
-					} else if (j == 10) {
-						searchType.setMaterialTypeName(value); // 物料类型
-					} else if (j == 11) {
-						searchVersion.setMaterialVersionName(value); // 物料版本
-					} else if (j == 11) {
-						processMaterial.setMaterialNum((Integer.parseInt(value)));
-					} else if (j == 12) {
-						serchEquip.setEquipName(value); // 设备名称
-					} else if (j == 13) {
-						serchEquip.setEquipCode(value); // 设备编码
-
-						// 验证:查询物料、类型及版本
-						Map<String, Object> paramMap = new HashMap<String, Object>();
-						paramMap.put("material", search);
-						paramMap.put("searchType", searchType);
-						paramMap.put("materialVersion", searchVersion);
-						MngProcessRouteExcelForm searchExtMaterial = processRouteExtMapper.getFromExcelRow1(paramMap);
-						MngMaterial existMaterial = null;
-						MngMaterialType existType = null;
-						MngMaterialVersion existMaterialVersion = null;
-						if (searchExtMaterial != null) {
-							existMaterial = searchExtMaterial.getMaterial();
-							existType = searchExtMaterial.getType();
-							existMaterialVersion = searchExtMaterial.getVersion();
-						}
-						if (existMaterial == null) {
-							try {
-								throw new CommonException("导入失败，第" + i + "条记录 第" + (j + 1) + "列 ,物料档案不存在！");
-							} catch (CommonException e) {
-								e.printStackTrace();
-							}
-						}
-						if (existType == null) {
-							try {
-								throw new CommonException("导入失败，第" + i + "条记录 第" + (j + 1) + "列 ,物料类型不存在！");
-							} catch (CommonException e) {
-								e.printStackTrace();
-							}
-						}
-						if (existMaterialVersion == null) {
-							try {
-								throw new CommonException("导入失败，第" + i + "条记录 第" + (j + 1) + "列 ,物料版本不存在！");
-							} catch (CommonException e) {
-								e.printStackTrace();
-							}
-						}
-						// 验证:查询设备名称及编码
-						paramMap.clear();
-						paramMap.put("serchEquip", serchEquip);
-
-						MngProcessRouteExcelForm searchExtEquip = processRouteExtMapper.getFromExcelRow2(paramMap);
-						MngEquip existEquip = null;
-						if (searchExtEquip != null) {
-							existEquip = searchExtEquip.getEquip();
-						}
-						if (existEquip == null) {
-							try {
-								throw new CommonException("导入失败，第" + i + "条记录 第" + (j + 1) + "列 ,设备不存在！");
-							} catch (CommonException e) {
-								e.printStackTrace();
-							}
-						}
-						// 验证:查询工作中心
-						paramMap.clear();
-						paramMap.put("serchCenter", serchCenter);
-						MngProcessRouteExcelForm searchExtCenter = processRouteExtMapper.getFromExcelRow3(paramMap);
-						MngWorkCenter existWorkCenter = null;
-						if (searchExtCenter != null) {
-							existWorkCenter = searchExtCenter.getCenter();
-						}
-						if (existWorkCenter == null) {
-							try {
-								throw new CommonException("导入失败，第" + i + "条记录 第" + (j + 1) + "列 ,工作中心不存在！");
-							} catch (CommonException e) {
-								e.printStackTrace();
-							}
-						}
-
-						String id = UUIDUtil.getUUID();
-
-						addRoute.setProcessRouteId(id);
-
-						processMaterial.setMaterialId(existMaterial.getMaterialId());
-						processMaterial.setMaterialId(existMaterial.getMaterialCode());
-						processMaterial.setWorkProcessId(id);
-
-						processEquip.setEquipId(serchEquip.getEquipId());
-						processEquip.setWorkProcessId(id);
-
-						workProcess.setWorkCenterId(existWorkCenter.getWorkCenterId());
-						workProcess.setProcessId(id);
-
-					} // --------读取每行单元格end-----------
-						// 读取完一行记录
-					processRouteList.add(addRoute);
-				} // ----------读取Excel所有行end
-				return processRouteList;
-			}
+                } // --------读取每行单元格end-----------
+                long result = checkUnique(sysUser);
+                if (result > 0) {
+                    try {
+                        // throw new CommonException("导入失败，第" + i + "条记录 第" + (j + 1) + "列 ,用户名或者手机号不唯一！");
+                        throw new CommonException("导入失败，第" + i + "条记录,用户名或者手机号不唯一！");
+                    } catch (CommonException e) {
+                        e.printStackTrace();
+                    }
+                }
+                // 读取完一行记录
+                userList.add(sysUser);
+			} // ----------读取Excel所有行end
+				return userList;
 		}
 		return null;
-	}*/
+	}
 
 }

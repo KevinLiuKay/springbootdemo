@@ -25,9 +25,9 @@
             <patternLayout pattern="${FORMAT}" />
         </console>
         <!-- 常用于开发环境,把日志记录到文件中,默认追加 -->
-        <file name="file" fileName="${LOG_HOME}/springbootdemo.log" append="false">
+       <!-- <file name="file" fileName="${LOG_HOME}/springbootdemo.log" append="false">
             <patternLayout pattern="${FORMAT}" />
-        </file>
+        </file>-->
     </appenders>
 
     <!-- 接收appender -->

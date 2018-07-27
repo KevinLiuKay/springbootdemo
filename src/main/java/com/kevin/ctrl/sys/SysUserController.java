@@ -13,7 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
+import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -55,6 +55,25 @@ public class SysUserController {
         JsonResult jsonResult = new JsonResult();
         try {
             int result = sysUserService.save(sysUser);
+            if (GlobalConstant.ZERO !=  result) {
+                jsonResult.setStatus(true);
+                jsonResult.setMessage(GlobalConstant.OPERATE_SUCCESSED);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            jsonResult.setStatus(false);
+            jsonResult.setMessage(e.getClass().getName() + ":" + e.getMessage());
+        }
+        return jsonResult;
+    }
+
+    @ApiOperation(value = "批量逻辑删除用户", notes = "批量逻辑删除用户", code = 200, produces = "application/json")
+    @RequestMapping(value = "/batchLogicDeleteUser", method = RequestMethod.POST)
+    public JsonResult batchLogicDeleteUser( @ApiParam(name = "userIds",value = "ids数组", required = true) @RequestParam(name = "userIds", required = true) String [] userIds){
+        JsonResult jsonResult = new JsonResult();
+        try {
+            List<String> list = Arrays.asList(userIds);
+            int result = sysUserService.batchLogicDelete(list);
             if (GlobalConstant.ZERO !=  result) {
                 jsonResult.setStatus(true);
                 jsonResult.setMessage(GlobalConstant.OPERATE_SUCCESSED);
