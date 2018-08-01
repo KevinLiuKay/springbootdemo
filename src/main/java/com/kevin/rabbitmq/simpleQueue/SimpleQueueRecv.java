@@ -1,4 +1,4 @@
-package com.kevin.rabbitmq;
+package com.kevin.rabbitmq.simpleQueue;
 
 import com.kevin.common.utils.RabbitMQConnectionUtil;
 import com.rabbitmq.client.*;
@@ -11,10 +11,10 @@ import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 
 /**
- * 消费者
+ * 简单队列-消费者
  */
 public class SimpleQueueRecv {
-    private static final String QUEUE_NAME = "queue_simple";
+    private static final String QUEUE_NAME = "simple_queue";
 
     public static void main(String[] args) throws IOException, TimeoutException {
 
