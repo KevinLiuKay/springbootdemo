@@ -21,6 +21,18 @@ spring:
    testOnBorrow: true
    testWhileIdle: true
    timeBetweenEvictionRunsMillis: 60000
+   #配置rabbitmq连接
+   rabbitmq:
+       host: localhost
+       port: 5672
+       username: guest
+       password: guest
+       virtual-host: /
+       # 轮询分发prefetch默认是1(公平分发），如果设置为0就是轮询模式
+       listener:
+         simple:
+           prefetch: 0
+   #    publisher-confirms: true
   #配置redis数据库连接
 #   redis:
 #     host: 127.0.0.1

@@ -1,13 +1,13 @@
 package com.kevin.rabbitmq.subscriptionModel;
 
-import com.kevin.common.utils.RabbitMQConnectionUtil;
+import com.kevin.common.utils.RabbitMqConnectionUtil;
 import com.rabbitmq.client.*;
-
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 
 /**
  * 订阅模式-邮件消费者
+ * @author lzk
  */
 public class SubscriptionModelEmailRecv {
     /**
@@ -18,7 +18,7 @@ public class SubscriptionModelEmailRecv {
 
     public static void main(String[] args) throws IOException, TimeoutException {
         // 获取连接
-        Connection connection = (Connection) RabbitMQConnectionUtil.getConnection();
+        Connection connection = (Connection) RabbitMqConnectionUtil.getConnection();
         // 打开通道
         Channel channel = connection.createChannel();
         // 申明要消费的队列

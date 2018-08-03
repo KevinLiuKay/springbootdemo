@@ -7,11 +7,12 @@ import java.io.IOException;
 
 /**
  * 获取RabbitMQ Connection连接
+ * @author lzk
  * @return
  * @throws IOException
  * @throws TimeoutException
  */
-public class RabbitMQConnectionUtil {
+public class RabbitMqConnectionUtil {
     private static final String HOST = "localhost";
     private static final int PORT = 5672;
 
@@ -20,8 +21,8 @@ public class RabbitMQConnectionUtil {
         ConnectionFactory connectionFactory = new ConnectionFactory();
         //设置服务地址
         connectionFactory.setHost(HOST);
-        //端口
-        connectionFactory.setPort(PORT);    //amqp协议 端口 类似与mysql的3306
+        //端口(amqp协议 端口 类似与mysql的3306)
+        connectionFactory.setPort(PORT);
         //设置账号信息，用户名、密码、vhost
         connectionFactory.setUsername("guest");
         connectionFactory.setPassword("guest");

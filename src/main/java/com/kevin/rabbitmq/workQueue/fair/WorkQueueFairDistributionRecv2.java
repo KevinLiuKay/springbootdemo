@@ -1,6 +1,6 @@
 package com.kevin.rabbitmq.workQueue.fair;
 
-import com.kevin.common.utils.RabbitMQConnectionUtil;
+import com.kevin.common.utils.RabbitMqConnectionUtil;
 import com.rabbitmq.client.AMQP.BasicProperties;
 import com.rabbitmq.client.*;
 
@@ -9,13 +9,14 @@ import java.util.concurrent.TimeoutException;
 
 /**
  * 工作队列-公平分发-消费者2
+ * @author lzk
  */
 public class WorkQueueFairDistributionRecv2 {
     private static final String QUEUE_NAME = "work_queue_fair_distribution";
 
     public static void main(String[] args) throws IOException, TimeoutException {
         // 打开通道
-        Connection connection = (Connection)RabbitMQConnectionUtil.getConnection();
+        Connection connection = (Connection)RabbitMqConnectionUtil.getConnection();
         // 打开通道
         Channel channel = connection.createChannel();
         //声明一个要消费的队列

@@ -1,6 +1,6 @@
 package com.kevin.rabbitmq.routeModel;
 
-import com.kevin.common.utils.RabbitMQConnectionUtil;
+import com.kevin.common.utils.RabbitMqConnectionUtil;
 import com.rabbitmq.client.BuiltinExchangeType;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
@@ -12,13 +12,14 @@ import java.util.concurrent.TimeoutException;
  * 路由模式-生产者（direct交换机）
  * 跟订阅模式类似，只不过在订阅模式的基础上加上了类型，
  * 订阅模式是分发到所有绑定到交换机的队列，路由模式只分发到绑定在交换机上面指定路由键的队列。
+ * @author lzk
  */
 public class RouteModelSend {
     private static final String EXCHANGE_NAME = "route_model_exchange_direct";
 
     public static void main(String[] args) throws IOException, TimeoutException {
         // 获取连接
-        Connection connection = (Connection)RabbitMQConnectionUtil.getConnection();
+        Connection connection = (Connection)RabbitMqConnectionUtil.getConnection();
         // 从连接开一个通道
         Channel channel = connection.createChannel();
         // 声明一个direct分发交换机
@@ -33,7 +34,7 @@ public class RouteModelSend {
         String infoMessage = "hello, info";
         channel.basicPublish(EXCHANGE_NAME, "info", null, infoMessage.getBytes());
         System.out.println(" [x] Sent routing info message : '" + infoMessage + "'");
-        // 发送warning路由键消息
+        // 发送warn路由键消息
         String warningMessage = "hello, warning";
         channel.basicPublish(EXCHANGE_NAME, "warn", null, warningMessage.getBytes());
         System.out.println(" [x] Sent routing warning message : '" + warningMessage + "'");

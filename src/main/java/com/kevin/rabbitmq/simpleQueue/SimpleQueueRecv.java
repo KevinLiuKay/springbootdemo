@@ -1,8 +1,7 @@
 package com.kevin.rabbitmq.simpleQueue;
 
-import com.kevin.common.utils.RabbitMQConnectionUtil;
+import com.kevin.common.utils.RabbitMqConnectionUtil;
 import com.rabbitmq.client.*;
-import com.rabbitmq.client.AMQP.BasicProperties;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.DefaultConsumer;
@@ -12,6 +11,7 @@ import java.util.concurrent.TimeoutException;
 
 /**
  * 简单队列-消费者
+ * @author lzk
  */
 public class SimpleQueueRecv {
     private static final String QUEUE_NAME = "simple_queue";
@@ -19,7 +19,7 @@ public class SimpleQueueRecv {
     public static void main(String[] args) throws IOException, TimeoutException {
 
         // 获取连接
-        Connection connection = (Connection)RabbitMQConnectionUtil.getConnection();
+        Connection connection = (Connection)RabbitMqConnectionUtil.getConnection();
         // 打开通道
         Channel channel = connection.createChannel();
 

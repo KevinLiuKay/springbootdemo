@@ -1,6 +1,6 @@
 package com.kevin.rabbitmq.simpleQueue;
 
-import com.kevin.common.utils.RabbitMQConnectionUtil;
+import com.kevin.common.utils.RabbitMqConnectionUtil;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 
@@ -9,13 +9,14 @@ import java.util.concurrent.TimeoutException;
 
 /**
  * 简单队列-生产者
+ * @author lzk
  */
 public class SimpleQueueSend {
     private static final String QUEUE_NAME = "simple_queue";
 
     public static void main(String[] args) throws IOException, TimeoutException {
         /* 获取一个连接 */
-        Connection connection = (Connection)RabbitMQConnectionUtil.getConnection();
+        Connection connection = (Connection)RabbitMqConnectionUtil.getConnection();
         /*从连接中创建通道*/
         Channel channel = connection.createChannel();
         /*

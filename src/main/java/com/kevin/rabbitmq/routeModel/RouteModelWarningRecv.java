@@ -1,6 +1,6 @@
 package com.kevin.rabbitmq.routeModel;
 
-import com.kevin.common.utils.RabbitMQConnectionUtil;
+import com.kevin.common.utils.RabbitMqConnectionUtil;
 import com.rabbitmq.client.*;
 
 import java.io.IOException;
@@ -8,6 +8,7 @@ import java.util.concurrent.TimeoutException;
 
 /**
  * 路由模式-warning日志消费者
+ * @author lzk
  */
 public class RouteModelWarningRecv {
     /**
@@ -18,7 +19,7 @@ public class RouteModelWarningRecv {
 
     public static void main(String[] args) throws IOException, TimeoutException {
         // 获取连接
-        Connection connection = (Connection) RabbitMQConnectionUtil.getConnection();
+        Connection connection = (Connection) RabbitMqConnectionUtil.getConnection();
         // 打开通道
         Channel channel = connection.createChannel();
         // 申明要消费的队列
