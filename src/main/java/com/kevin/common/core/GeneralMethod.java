@@ -19,8 +19,9 @@ public class GeneralMethod {
 		SysUser currUser = HttpServletContext.getCurrentUser();
 		Class<?> clazz = obj.getClass();
 		try {
-			if(isInsert){//insert
-				Method setRecordState = clazz.getMethod("setRecordState", Integer.class);
+			//insert
+			if(isInsert){
+				Method setRecordState = clazz.getMethod("setRecordState", String.class);
 				setRecordState.invoke(obj, GlobalConstant.Y);
 				Method setCreateTime = clazz.getMethod("setCreateTime", Date.class);
 				setCreateTime.invoke(obj,  Calendar.getInstance().getTime());

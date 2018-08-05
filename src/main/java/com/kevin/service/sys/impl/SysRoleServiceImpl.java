@@ -1,34 +1,54 @@
 package com.kevin.service.sys.impl;
 import com.kevin.common.GlobalConstant.GlobalConstant;
 import com.kevin.common.core.GeneralMethod;
-import com.kevin.common.shiro.PasswordHelper;
+
+import com.kevin.common.core.HttpServletContext;
 import com.kevin.common.utils.UUIDUtil;
+import com.kevin.dao.extMapper.sys.SysRoleExtMapper;
 import com.kevin.dao.mapper.SysRoleMapper;
+import com.kevin.dao.mapper.SysUserRoleMapper;
 import com.kevin.model.SysRole;
 import com.kevin.model.SysRoleExample;
+import com.kevin.model.SysUserRole;
+import com.kevin.model.SysUserRoleExample;
+import com.kevin.model.SysUserRoleExample.Criteria;
 import com.kevin.service.sys.ISysRoleService;
+import com.kevin.service.sys.ISysUserRoleService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+/**
+ * @author lzk
+ */
 @Service
 @Transactional(rollbackFor = Exception.class)
 public class SysRoleServiceImpl implements ISysRoleService {
-    @Autowired
-    private SysRoleMapper sysRoleMapper;
     private static Logger logger = LoggerFactory.getLogger(SysRoleServiceImpl.class);
+
+    @Resource
+    private SysRoleMapper sysRoleMapper;
+
+    @Resource
+    private ISysUserRoleService sysUserRoleService;
 
     @Override
     public int save(SysRole sysRole) {
-        if (StringUtils.isBlank(sysRole.getRoleId())) {//新增
+        if (StringUtils.isBlank(sysRole.getRoleId())) {
+            //新增
             sysRole.setRoleId(UUIDUtil.getUUID());
             GeneralMethod.setRecordInfo(sysRole, true);
             return sysRoleMapper.insertSelective(sysRole);
-        } else {//修改
+        } else {
+            //修改
             GeneralMethod.setRecordInfo(sysRole, false);
             return sysRoleMapper.updateByPrimaryKeySelective(sysRole);
         }
@@ -81,4 +101,6 @@ public class SysRoleServiceImpl implements ISysRoleService {
             criteria.andRoleNameLike(GlobalConstant.PERCENT + sysRole.getRoleName() + GlobalConstant.PERCENT);
         }
     }
+
+
 }

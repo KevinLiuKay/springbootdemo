@@ -1,6 +1,8 @@
 package com.kevin.service.sys;
 
+import com.kevin.common.utils.JsonResult;
 import com.kevin.model.SysUser;
+import com.kevin.model.ext.sys.SysUserExt;
 import com.kevin.service.ICommonService;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -50,6 +52,28 @@ public interface ISysUserService extends ICommonService<SysUser> {
      */
     public Map<String, Object> batchInsertUserByExcel(MultipartFile file) throws Exception;
 
+    /**
+     *修改当前登录用户的密码
+     * @param oldUserPwd
+     * @param newUserPwd
+     * @return
+     */
+    JsonResult updateCurrtUserPwd(String oldUserPwd, String newUserPwd);
+
+    /**
+     *保存重置密码
+     * @param userId
+     * @param userPwd
+     * @return
+     */
+    JsonResult resetPwd(String userId,String userPwd);
+
+    /**
+     * 查询用户所有信息包括部门，角色
+     * @param sysUser
+     * @return
+     */
+    List<SysUserExt> queryUserExtList(SysUser sysUser);
     /**********************************ehcache缓存*******************************************/
     /**
      * @CachePut : 使用@CachePut标注的方法在执行前不会去检查缓存中是否存在之前执行过的结果，而是每次都会执行该方法，并将执行结果以键值对的形式存入指定的缓存中。

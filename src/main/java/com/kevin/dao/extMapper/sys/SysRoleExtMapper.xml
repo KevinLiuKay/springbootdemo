@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.kevin.dao.extMapper.sys.SysRoleExtMapper">
+    <resultMap id="extMap" type="com.kevin.model.ext.sys.SysUserExt" extends="com.kevin.dao.mapper.SysUserMapper.BaseResultMap">
+		<collection property="roleList" ofType="com.kevin.model.SysRole">
+			<id property="roleId"  column="role_id" jdbcType="VARCHAR" />
+			<result property="roleName" column="role_name" jdbcType="VARCHAR"  />
+		</collection>
+	</resultMap>
+	<!-- 通过roleId，userIdList查找关联表信息 -->
+	<select id="queryRoleUserList" parameterType="java.util.Map" resultMap="com.kevin.dao.mapper.SysUserRoleMapper.BaseResultMap" >
+		select
+		ur.user_role_id,ur.user_id,ur.role_id
+		from sys_user_role ur
+		where ur.role_id = #{roleId}
+		<if test="userIdList != null and userIdList.size > 0">
+			and user_id in
+			<foreach collection="userIdList" open="(" separator="," close=")" item="item">
+				#{item}
+			</foreach>
+		</if>
+	</select>
+
+	<!-- 修改sys_user_role关联表状态为Y -->
+	<update id="updateRecordStateN2Y" parameterType="java.util.Map">
+		<if test="userRoleIdList != null and userRoleIdList.size > 0">
+			update
+			SYS_USER_ROLE
+			set
+			RECORD_STATE = 'Y',
+			UPDATE_USER_ID = #{currUserId},
+			UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP}
+			where user_role_id in
+			<foreach collection="userRoleIdList" open="(" separator="," close=")" item="item">
+				#{item}
+			</foreach>
+		</if>
+	</update>
+
+	<!-- 删除用户角色关联 -->
+	<update id="deleteRoleUser" parameterType="com.kevin.model.SysUserRole">
+	    update
+			SYS_USER_ROLE
+		set
+			RECORD_STATE = 'N',
+			UPDATE_USER_ID = #{updateUserId},
+	 		UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP}
+	 	<where>
+			<if test="userId != null and userId != '' ">
+				and USER_ID = #{userId}
+			</if>
+			<if test="roleId != null and roleId != '' ">
+				and  ROLE_ID = #{roleId}
+			</if>
+		</where>
+
+	</update>
+
+	<!-- 通过roleId查找用户信息 -->
+	<select id="queryUserExtListByRoleId" parameterType="java.util.Map" resultMap="extMap" >
+		select
+		u.user_id,u.user_acc,u.user_name,u.user_phone,u.user_addr,
+		r.role_id, r.role_name
+		from sys_user u
+		INNER JOIN sys_user_role ur ON ur.user_id = u.user_id
+		INNER JOIN sys_role r ON r.role_id = ur.role_id
+		where u.record_state = 'Y' AND ur.record_state = 'Y'AND r.record_state = 'Y'
+		<if test="roleId != null and roleId != '' ">
+			AND ur.role_id = #{roleId}
+		</if>
+		<if test="sysUser != null">
+			<if test="sysUser.userName != null and sysUser.userName != '' ">
+				<bind name="userName" value=" '%' + sysUser.userName + '%' " />
+				and u.user_name like #{userName}
+			</if>
+			<if test="sysUser.userPhone != null and sysUser.userPhone != '' ">
+				<bind name="userPhone" value=" '%' + sysUser.userPhone + '%' " />
+				and u.user_phone like #{userPhone}
+			</if>
+		</if>
+	</select>
+</mapper>

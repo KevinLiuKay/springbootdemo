@@ -1,6 +1,7 @@
 package com.kevin.dao.extMapper.sys;
 
 import com.kevin.model.SysUser;
+import com.kevin.model.ext.sys.SysUserExt;
 
 import java.util.List;
 import java.util.Map;
@@ -20,4 +21,10 @@ public interface SysUserExtMapper {
 	 */
 	int batchLogicDelete(Map<String, Object> map);
 
+	/**
+	 * 查询用户所有信息包括部门，角色
+	 * @param map
+	 * @return
+	 */
+	List<SysUserExt> queryUserExtList(Map<String, Object> map);
 }

@@ -14,6 +14,8 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.Resource;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,9 +27,11 @@ import java.util.Set;
 @Service
 @Transactional(rollbackFor = Exception.class)
 public class SysMenuServiceImpl implements ISysMenuService {
-    @Autowired
-    private SysMenuMapper sysMenuMapper;
     private static org.slf4j.Logger logger = LoggerFactory.getLogger(SysMenuServiceImpl.class);
+
+    @Resource
+    private SysMenuMapper sysMenuMapper;
+
     @Override
     public int save(SysMenu sysMenu) {
         if (StringUtils.isBlank(sysMenu.getMenuId())) {

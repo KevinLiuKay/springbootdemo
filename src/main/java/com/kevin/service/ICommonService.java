@@ -4,8 +4,7 @@ import java.util.List;
 
 /**
  * 所有的service接口都需要继承这个接口，提供了5个基础方法
- * @author sunmj
- *
+ * @author lzk
  * @param <T>
  */
 public interface ICommonService<T> {
@@ -30,7 +29,8 @@ public interface ICommonService<T> {
      * @return
      */
     int deleteById(String id);
-    
+
+
     /**
      * 查询基础列表
      * @param t

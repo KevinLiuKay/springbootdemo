@@ -1,27 +1,32 @@
 package com.kevin.model.ext.sys;
 
-import com.kevin.model.SysMenu;
+
+import com.kevin.model.SysOrg;
 import com.kevin.model.SysRole;
 import com.kevin.model.SysUser;
-import com.kevin.model.SysUserRoleRel;
 
+import java.util.List;
+
+/**
+ * @author lzk
+ */
 public class SysUserExt extends SysUser {
-    private SysUserRoleRel sysUserRole;//为角色配置用户
-    private SysRole sysRole;
+    private List<SysRole> roleList;
+    private SysOrg sysOrg;
 
-    public SysUserRoleRel getSysUserRole() {
-        return sysUserRole;
+    public List<SysRole> getRoleList() {
+        return roleList;
     }
 
-    public void setSysUserRole(SysUserRoleRel sysUserRole) {
-        this.sysUserRole = sysUserRole;
+    public void setRoleList(List<SysRole> roleList) {
+        this.roleList = roleList;
     }
 
-    public SysRole getSysRole() {
-        return sysRole;
+    public SysOrg getSysOrg() {
+        return sysOrg;
     }
 
-    public void setSysRole(SysRole sysRole) {
-        this.sysRole = sysRole;
+    public void setSysOrg(SysOrg sysOrg) {
+        this.sysOrg = sysOrg;
     }
 }

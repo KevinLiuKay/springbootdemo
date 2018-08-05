@@ -3,19 +3,28 @@ package com.kevin.ctrl.sys;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.kevin.common.GlobalConstant.GlobalConstant;
+import com.kevin.common.core.HttpServletContext;
+import com.kevin.common.shiro.PasswordHelper;
 import com.kevin.common.utils.JsonResult;
 import com.kevin.model.SysUser;
+import com.kevin.model.ext.sys.SysUserExt;
 import com.kevin.service.sys.ISysUserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+/**
+ * @author lzk
+ */
 @RestController
 @RequestMapping("/user")
 @Api(value = "userManage", tags = "userManage")
@@ -49,6 +58,29 @@ public class SysUserController {
         return jsonResult;
     }
 
+    @RequestMapping(value = "/queryUserExtList", method = RequestMethod.POST)
+    @ApiOperation(value = "查询用户所有信息（组织，角色信息)", notes = "查询用户所有信息（组织，角色信息)", code = 200, produces = "application/json")
+    public JsonResult userList(SysUserExt sysUserExt,
+                               @ApiParam(name = "pageNum", required = false) @RequestParam(name = "pageNum", required = false, defaultValue = "1") int pageNum,
+                               @ApiParam(name = "pageSize", required = false) @RequestParam(name = "pageSize", required = false, defaultValue = "10") int pageSize,
+        @ApiParam(name = "pageHelper",value = "是否开启分页", required = false) @RequestParam(name = "pageHelper", required = false, defaultValue = "true") boolean pageHelper) {
+        JsonResult jsonResult = new JsonResult();
+        try {
+            if(pageHelper) {
+                PageHelper.startPage(pageNum, pageSize);
+            }
+            PageHelper.startPage(pageNum, pageSize);
+            List<SysUserExt> userExtList = sysUserService.queryUserExtList(sysUserExt);
+            PageInfo<SysUserExt> pageInfo = new PageInfo<SysUserExt>(userExtList);
+            jsonResult.setModel(pageInfo);
+        } catch (Exception e) {
+            e.printStackTrace();
+            jsonResult.setStatus(false);
+            jsonResult.setMessage(e.getClass().getName() + ":" + e.getMessage());
+        }
+        return jsonResult;
+    }
+
     @ApiOperation(value = "保存用户", notes = "保存用户", code = 200, produces = "application/json")
     @RequestMapping(value = "/saveUser", method = RequestMethod.POST)
     public JsonResult userList(SysUser sysUser){
@@ -67,9 +99,28 @@ public class SysUserController {
         return jsonResult;
     }
 
+    @RequestMapping(value = "/logicDeleteUser" , method = RequestMethod.POST)
+    @ApiOperation(value = "删除用户", notes = "删除用户", code = 200, produces = "application/json")
+    public JsonResult deleteUser(@ApiParam(name = "userId", required = true) @RequestParam(name = "userId", required = true) String userId) {
+        JsonResult jsonResult = new JsonResult();
+        try {
+            int result = sysUserService.logicallyDeleteById(userId);
+            // 删除成功
+            if (GlobalConstant.ZERO !=  result) {
+                jsonResult.setStatus(true);
+                jsonResult.setMessage(GlobalConstant.DELETE_SUCCESSED);
+            }
+        }catch (Exception e) {
+            e.printStackTrace();
+            jsonResult.setStatus(false);
+            jsonResult.setMessage(e.getClass().getName() + ":" + e.getMessage());
+        }
+        return jsonResult;
+    }
+
     @ApiOperation(value = "批量逻辑删除用户", notes = "批量逻辑删除用户", code = 200, produces = "application/json")
     @RequestMapping(value = "/batchLogicDeleteUser", method = RequestMethod.POST)
-    public JsonResult batchLogicDeleteUser( @ApiParam(name = "userIds",value = "ids数组", required = true) @RequestParam(name = "userIds", required = true) String [] userIds){
+    public JsonResult batchLogicDeleteUser(@ApiParam(name = "userIds",value = "ids数组", required = true) @RequestParam(name = "userIds", required = true) String [] userIds){
         JsonResult jsonResult = new JsonResult();
         try {
             List<String> list = Arrays.asList(userIds);
@@ -86,4 +137,41 @@ public class SysUserController {
         return jsonResult;
     }
 
+    @RequestMapping(value = "/checkUnique" , method = RequestMethod.POST)
+    @ApiOperation(value = "验证手机号或账号的唯一性", notes = "验证手机号码或账号的唯一性", code = 200, produces = "application/json")
+    public JsonResult checkUnique(SysUser sysUser) {
+        JsonResult jsonResult = new JsonResult();
+        try {
+            long result = sysUserService.checkUnique(sysUser);
+            if(GlobalConstant.ZERO ==  result) {
+                jsonResult.setStatus(true);
+                jsonResult.setMessage(GlobalConstant.PHONE_ACC_UNIQUE);
+            } else {
+                jsonResult.setStatus(false);
+                jsonResult.setMessage(GlobalConstant.PHONE_ACC_EXIST);
+            }
+        }catch (Exception e) {
+            e.printStackTrace();
+            jsonResult.setStatus(false);
+            jsonResult.setMessage(e.getClass().getName() + ":" + e.getMessage());
+        }
+        return jsonResult;
+    }
+
+    @RequestMapping(value = "/updateCurrtUserPwd" , method = RequestMethod.POST)
+    @ApiOperation(value = "修改当前登录用户的密码", notes = "修改当前登录用户的密码", code = 200, produces = "application/json")
+    public JsonResult updateCurrUserPwd(
+            @ApiParam(name = "oldUserPwd", required = true) @RequestParam(name = "oldUserPwd", required = true) String oldUserPwd,
+            @ApiParam(name = "newUserPwd", required = true) @RequestParam(name = "newUserPwd", required = true) String newUserPwd) {
+
+        return sysUserService.updateCurrtUserPwd(oldUserPwd, newUserPwd);
+    }
+
+    @RequestMapping(value = "/resetPwd" , method = RequestMethod.POST)
+    @ApiOperation(value = "保存重置密码", notes = "保存重置密码", code = 200, produces = "application/json")
+    public JsonResult resetPwd(
+            @ApiParam(name = "userId", required = true) @RequestParam(name = "userId", required = true) String userId,
+            @ApiParam(name = "userPwd", required = false) @RequestParam(name = "userPwd", required = false) String userPwd) {
+        return sysUserService.resetPwd(userId, userPwd);
+    }
 }

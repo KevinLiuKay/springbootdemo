@@ -5,12 +5,14 @@ import com.kevin.common.core.GeneralMethod;
 import com.kevin.common.core.HttpServletContext;
 import com.kevin.common.shiro.PasswordHelper;
 import com.kevin.common.utils.ExcelUtil;
+import com.kevin.common.utils.JsonResult;
 import com.kevin.common.utils.UUIDUtil;
 import com.kevin.dao.extMapper.sys.SysUserExtMapper;
 import com.kevin.dao.mapper.SysUserMapper;
 import com.kevin.exception.CommonException;
 import com.kevin.model.SysUser;
 import com.kevin.model.SysUserExample;
+import com.kevin.model.ext.sys.SysUserExt;
 import com.kevin.service.pub.IFileService;
 import com.kevin.service.sys.ISysUserService;
 import com.sun.xml.internal.messaging.saaj.util.ByteInputStream;
@@ -34,6 +36,9 @@ import javax.annotation.Resource;
 import java.io.InputStream;
 import java.util.*;
 
+/**
+ * @author lzk
+ */
 @Service
 @Transactional(rollbackFor = Exception.class)
 public class SysUserServiceImpl implements ISysUserService {
@@ -52,12 +57,14 @@ public class SysUserServiceImpl implements ISysUserService {
     @Override
     @CachePut(value = "currUser",key = "'sysUser_'+#sysUser.getUserId()")
     public int save(SysUser sysUser) {
-        if (StringUtils.isBlank(sysUser.getUserId())) {//新增
+        if (StringUtils.isBlank(sysUser.getUserId())) {
+            //新增
             sysUser.setUserId(UUIDUtil.getUUID());
             sysUser.setUserPwd(PasswordHelper.encryptPassword(sysUser.getUserId(), GlobalConstant.RESET_PASSWORD));
             GeneralMethod.setRecordInfo(sysUser, true);
             return sysUserMapper.insertSelective(sysUser);
-        } else {//修改
+        } else {
+            //修改
             GeneralMethod.setRecordInfo(sysUser, false);
             return sysUserMapper.updateByPrimaryKeySelective(sysUser);
         }
@@ -88,7 +95,6 @@ public class SysUserServiceImpl implements ISysUserService {
     @Override
 //    @Cacheable(value = "currUser",key="'sysUser_'+#sysUser.getUserId()")
     public List<SysUser> queryList(SysUser sysUser, String orderByClause) {
-//        System.err.println("没有走缓存！"+sysUser.getUserId());
 //        SysUser setRedisCurrUser = (SysUser)redisUtil.get("currUser");
 //        logger.debug("-------------redis缓存中获取当前用户信息:--------------------" + setRedisCurrUser.getUserName() + setRedisCurrUser.getUserAcc());
         SysUserExample example = new SysUserExample();
@@ -126,7 +132,6 @@ public class SysUserServiceImpl implements ISysUserService {
         sysUser.setUserName(GlobalConstant.ROOT_USER_NAME);
         String newPwd = PasswordHelper.encryptPassword(GlobalConstant.ROOT_USER_ID, GlobalConstant.RESET_PASSWORD);
         sysUser.setUserPwd(newPwd);
-        //sysUser.setStatusId(UserStatusEnum.Activated.getId());
         sysUser.setRecordState(GlobalConstant.Y);
         sysUser.setCreateUserId(GlobalConstant.ROOT_USER_ID);
         sysUser.setCreateTime(Calendar.getInstance().getTime());
@@ -150,13 +155,15 @@ public class SysUserServiceImpl implements ISysUserService {
     @Override
     public long checkUnique(SysUser sysUser) {
         SysUserExample example = new SysUserExample();
-        SysUserExample.Criteria criteria = example.createCriteria().andRecordStateEqualTo(GlobalConstant.Y);
-        SysUserExample.Criteria criteria2 = example.createCriteria().andRecordStateEqualTo(GlobalConstant.Y);
+        SysUserExample.Criteria criteria = example.createCriteria();
+        SysUserExample.Criteria criteria2 = example.createCriteria();
         if (StringUtils.isNotBlank(sysUser.getUserAcc())) {
             criteria.andUserAccEqualTo(sysUser.getUserAcc());
+            criteria.andRecordStateEqualTo(GlobalConstant.Y);
         }
         if (StringUtils.isNotBlank(sysUser.getUserPhone())) {
             criteria2.andUserPhoneEqualTo(sysUser.getUserPhone());
+            criteria2.andRecordStateEqualTo(GlobalConstant.Y);
         }
         //非自己！
         if (StringUtils.isNotBlank(sysUser.getUserId())) {
@@ -192,7 +199,7 @@ public class SysUserServiceImpl implements ISysUserService {
 
     @Override
     public Map<String, Object> batchInsertUserByExcel(MultipartFile file) throws Exception{
-        Map<String, Object> resultMap = new HashMap<>();
+        Map<String, Object> resultMap = new HashMap<String, Object>();
         /*
          * 允许上传Excel的MIME类型、后缀、大小
          */
@@ -208,12 +215,11 @@ public class SysUserServiceImpl implements ISysUserService {
         //保存Excel中获取List
         SysUser currentUser = HttpServletContext.getCurrentUser();
         Date currentTime = Calendar.getInstance().getTime();
-        PasswordHelper passwordHelper = new PasswordHelper();
         if (userListByExcel != null && !userListByExcel.isEmpty()) {
             for (SysUser sysUser : userListByExcel) {
                 String userId = UUIDUtil.getUUID();
                 sysUser.setUserId(userId);
-                String pwd = passwordHelper.encryptPassword(userId,GlobalConstant.ROOT_PASSWORD);
+                String pwd = PasswordHelper.encryptPassword(userId,GlobalConstant.ROOT_PASSWORD);
                 sysUser.setUserPwd(pwd);
                 if(currentUser != null) {
                     sysUser.setCreateUserId(currentUser.getUserId());
@@ -225,6 +231,74 @@ public class SysUserServiceImpl implements ISysUserService {
             resultMap.put("result", result);
         }
         return null;
+    }
+
+    @Override
+    public JsonResult updateCurrtUserPwd(String oldUserPwd, String newUserPwd) {
+        JsonResult jsonResult = new JsonResult();
+        try {
+            if(StringUtils.isNotBlank(oldUserPwd) && StringUtils.isNotBlank(newUserPwd)) {
+                //获取session原密码
+                SysUser currUser = HttpServletContext.getCurrentUser();
+                //数据库存加密的
+                String currUserPwd = currUser.getUserPwd();
+                //旧密码加密
+                oldUserPwd = PasswordHelper.encryptPassword(currUser.getUserId(), oldUserPwd);
+                //比对加密结果是否一致
+                if (!currUserPwd.equals(oldUserPwd)) {
+                    jsonResult.setStatus(false);
+                    jsonResult.setMessage("原密码错误！");
+                }
+                SysUser sysUser = new SysUser();
+                sysUser.setUserId(currUser.getUserId());
+                //新密码加密
+                sysUser.setUserPwd(PasswordHelper.encryptPassword(currUser.getUserId(), newUserPwd));
+                int result = save(sysUser);
+                if (GlobalConstant.ZERO != result) {
+                    jsonResult.setMessage(GlobalConstant.UPDATE_SUCCESSED);
+                }
+            }
+        }catch (Exception e) {
+            e.printStackTrace();
+            jsonResult.setStatus(false);
+            jsonResult.setMessage(e.getClass().getName() + ":" + e.getMessage());
+        }
+        return jsonResult;
+    }
+
+    @Override
+    public JsonResult resetPwd(String userId, String userPwd) {
+        JsonResult jsonResult = new JsonResult();
+        try {
+            if(StringUtils.isNotBlank(userId)) {
+                SysUser sysUser = new SysUser();
+                sysUser.setUserId(userId);
+                //重置密码如果用户输入密码则使用新密码否则使用默认密码
+                if(StringUtils.isNotBlank(userPwd)) {
+                    sysUser.setUserPwd(PasswordHelper.encryptPassword(userId, userPwd));
+                } else {
+                    sysUser.setUserPwd(PasswordHelper.encryptPassword(userId, GlobalConstant.RESET_PASSWORD));
+                }
+                int result = save(sysUser);
+                if (GlobalConstant.ZERO!= result) {
+                    jsonResult.setStatus(true);
+                    jsonResult.setMessage(GlobalConstant.UPDATE_SUCCESSED);
+                }
+            }
+        }catch (Exception e) {
+            e.printStackTrace();
+            jsonResult.setStatus(false);
+            jsonResult.setMessage(e.getClass().getName() + ":" + e.getMessage());
+        }
+        return jsonResult;
+    }
+
+    @Override
+    public List<SysUserExt> queryUserExtList(SysUser sysUser) {
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("sysUser", sysUser);
+        map.put("orderByClause", "u.create_time DESC");
+        return sysUserExtMapper.queryUserExtList(map);
     }
 
 
@@ -261,7 +335,6 @@ public class SysUserServiceImpl implements ISysUserService {
             byte[] fileData = new byte[(int) excelFile.getSize()];
             is.read(fileData);
             Workbook wb = ExcelUtil.createCommonWorkbook(new ByteInputStream(fileData, (int) excelFile.getSize()));
-            //Workbook wb = ExcelUtil.createCommonWorkbook(new POIFSFileSystem(excelFile.getInputStream()));
             return wb;
         }catch (Exception e){
             // ******************* 抛出自定义异常 ！！！！！*********************
@@ -285,23 +358,29 @@ public class SysUserServiceImpl implements ISysUserService {
      */
 
 	private List<SysUser> workbookEncapIntoList(Workbook wb) {
-		int sheetNum = wb.getNumberOfSheets();// workbook中的sheet数
+        // workbook中的sheet数
+		int sheetNum = wb.getNumberOfSheets();
 		if (sheetNum > 0) {
 			List<SysUser> userList = new ArrayList<>();
 			Sheet sheet;
 			try {
-				sheet = (HSSFSheet) wb.getSheetAt(0);// 得到第一个sheet（以excel的版本来分别）
+                // 得到第一个sheet（以excel的版本来分别）
+				sheet = (HSSFSheet) wb.getSheetAt(0);
 			} catch (Exception e) {
 				sheet = (XSSFSheet) wb.getSheetAt(0);
 			}
-			int row_num = sheet.getLastRowNum(); // excel的总行数
-			for (int i = 1; i <= row_num; i++) {// 读取每行
+            // excel的总行数
+			int row_num = sheet.getLastRowNum();
+            // 读取每行
+			for (int i = 1; i <= row_num; i++) {
                 // -----单元格begin------
                 Row r = sheet.getRow(i);
-                int cell_num = 5;// 定死列数 防止读其他空的列
+                // 定死列数 防止读其他空的列
+                int cell_num = 5;
                 SysUser sysUser = new SysUser();
                 String key = GlobalConstant.EMPTY;
-                for (int j = 0; j < cell_num; j++) {// 遍历一行每列
+                // 遍历一行每列
+                for (int j = 0; j < cell_num; j++) {
                     String value = "";
                     Cell cell = r.getCell((short) j);
                     if (cell == null) {
@@ -309,7 +388,8 @@ public class SysUserServiceImpl implements ISysUserService {
                     }
                     cell.setCellType(HSSFCell.CELL_TYPE_STRING);
                     if (cell.getCellType() == HSSFCell.CELL_TYPE_STRING) {
-                        value = r.getCell((short) j).getStringCellValue();// 将cell中的值付给value
+                        // 将cell中的值付给value
+                        value = r.getCell((short) j).getStringCellValue();
                     } else {
                         value = ExcelUtil._doubleTrans(r.getCell((short) j).getNumericCellValue());
                     }

@@ -3,7 +3,9 @@ package com.kevin.common.GlobalConstant;
 public class GlobalConstant {
 
 	public static final String PARAM_IS_EMPTY = "参数为空！";
-
+	public static final String PHONE_ACC_EXIST = "手机号或账号已存在！";
+	public static final String PHONE_ACC_UNIQUE = "手机号或账号唯一！";
+	public static final String SESSION_OUT_TIME = "当前用户未登录或session过期，请登录后重试";
 	public static final String ACCOUNT_OR_PASSWORD_ERROR = "用户名或密码错误！";
 	public static final String VALIDATECODE_ERROR = "验证码不正确！";
 	public static final String VALIDATECODE_INVALID = "验证码已失效！";

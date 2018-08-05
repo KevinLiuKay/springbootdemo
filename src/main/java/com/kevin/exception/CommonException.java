@@ -1,9 +1,7 @@
 package com.kevin.exception;
 
 /**
- * 
- * @author dell2
- *
+ * @author lzk
  */
 public class CommonException extends Exception {
 	
@@ -14,6 +12,7 @@ public class CommonException extends Exception {
 		this.message = message;
 	}
 
+	@Override
 	public String getMessage() {
 		return message;
 	}
