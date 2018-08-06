@@ -1,14 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.kevin.dao.mapper.SysOrgMapper" >
-  <resultMap id="BaseResultMap" type="com.kevin.model.SysOrg" >
-    <id column="org_id" property="orgId" jdbcType="VARCHAR" />
-    <result column="expanded" property="expanded" jdbcType="BIT" />
-    <result column="isleaf" property="isleaf" jdbcType="BIT" />
-    <result column="level" property="level" jdbcType="INTEGER" />
-    <result column="sort_key" property="sortKey" jdbcType="INTEGER" />
-    <result column="org_name" property="orgName" jdbcType="VARCHAR" />
-    <result column="org_parent_id" property="orgParentId" jdbcType="VARCHAR" />
+<mapper namespace="com.kevin.dao.mapper.SysUserOrgMapper" >
+  <resultMap id="BaseResultMap" type="com.kevin.model.SysUserOrg" >
+    <id column="user_org_id" property="userOrgId" jdbcType="VARCHAR" />
+    <result column="user_id" property="userId" jdbcType="VARCHAR" />
+    <result column="org_id" property="orgId" jdbcType="VARCHAR" />
     <result column="record_state" property="recordState" jdbcType="VARCHAR" />
     <result column="create_user_id" property="createUserId" jdbcType="VARCHAR" />
     <result column="create_time" property="createTime" jdbcType="DATE" />
@@ -74,16 +70,16 @@
     </where>
   </sql>
   <sql id="Base_Column_List" >
-    org_id, expanded, isleaf, level, sort_key, org_name, org_parent_id, record_state, 
-    create_user_id, create_time, update_user_id, update_time
+    user_org_id, user_id, org_id, record_state, create_user_id, create_time, update_user_id, 
+    update_time
   </sql>
-  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.kevin.model.SysOrgExample" >
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.kevin.model.SysUserOrgExample" >
     select
     <if test="distinct" >
       distinct
     </if>
     <include refid="Base_Column_List" />
-    from sys_org
+    from sys_user_org
     <if test="_parameter != null" >
       <include refid="Example_Where_Clause" />
     </if>
@@ -94,54 +90,38 @@
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
     select 
     <include refid="Base_Column_List" />
-    from sys_org
-    where org_id = #{orgId,jdbcType=VARCHAR}
+    from sys_user_org
+    where user_org_id = #{userOrgId,jdbcType=VARCHAR}
   </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
-    delete from sys_org
-    where org_id = #{orgId,jdbcType=VARCHAR}
+    delete from sys_user_org
+    where user_org_id = #{userOrgId,jdbcType=VARCHAR}
   </delete>
-  <delete id="deleteByExample" parameterType="com.kevin.model.SysOrgExample" >
-    delete from sys_org
+  <delete id="deleteByExample" parameterType="com.kevin.model.SysUserOrgExample" >
+    delete from sys_user_org
     <if test="_parameter != null" >
       <include refid="Example_Where_Clause" />
     </if>
   </delete>
-  <insert id="insert" parameterType="com.kevin.model.SysOrg" >
-    insert into sys_org (org_id, expanded, isleaf, 
-      level, sort_key, org_name, 
-      org_parent_id, record_state, create_user_id, 
-      create_time, update_user_id, update_time
-      )
-    values (#{orgId,jdbcType=VARCHAR}, #{expanded,jdbcType=BIT}, #{isleaf,jdbcType=BIT}, 
-      #{level,jdbcType=INTEGER}, #{sortKey,jdbcType=INTEGER}, #{orgName,jdbcType=VARCHAR}, 
-      #{orgParentId,jdbcType=VARCHAR}, #{recordState,jdbcType=VARCHAR}, #{createUserId,jdbcType=VARCHAR}, 
-      #{createTime,jdbcType=DATE}, #{updateUserId,jdbcType=VARCHAR}, #{updateTime,jdbcType=DATE}
-      )
+  <insert id="insert" parameterType="com.kevin.model.SysUserOrg" >
+    insert into sys_user_org (user_org_id, user_id, org_id, 
+      record_state, create_user_id, create_time, 
+      update_user_id, update_time)
+    values (#{userOrgId,jdbcType=VARCHAR}, #{userId,jdbcType=VARCHAR}, #{orgId,jdbcType=VARCHAR}, 
+      #{recordState,jdbcType=VARCHAR}, #{createUserId,jdbcType=VARCHAR}, #{createTime,jdbcType=DATE}, 
+      #{updateUserId,jdbcType=VARCHAR}, #{updateTime,jdbcType=DATE})
   </insert>
-  <insert id="insertSelective" parameterType="com.kevin.model.SysOrg" >
-    insert into sys_org
+  <insert id="insertSelective" parameterType="com.kevin.model.SysUserOrg" >
+    insert into sys_user_org
     <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="userOrgId != null" >
+        user_org_id,
+      </if>
+      <if test="userId != null" >
+        user_id,
+      </if>
       <if test="orgId != null" >
         org_id,
-      </if>
-      <if test="expanded != null" >
-        expanded,
-      </if>
-      <if test="isleaf != null" >
-        isleaf,
-      </if>
-      <if test="level != null" >
-        level,
-      </if>
-      <if test="sortKey != null" >
-        sort_key,
-      </if>
-      <if test="orgName != null" >
-        org_name,
-      </if>
-      <if test="orgParentId != null" >
-        org_parent_id,
       </if>
       <if test="recordState != null" >
         record_state,
@@ -160,26 +140,14 @@
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="userOrgId != null" >
+        #{userOrgId,jdbcType=VARCHAR},
+      </if>
+      <if test="userId != null" >
+        #{userId,jdbcType=VARCHAR},
+      </if>
       <if test="orgId != null" >
         #{orgId,jdbcType=VARCHAR},
-      </if>
-      <if test="expanded != null" >
-        #{expanded,jdbcType=BIT},
-      </if>
-      <if test="isleaf != null" >
-        #{isleaf,jdbcType=BIT},
-      </if>
-      <if test="level != null" >
-        #{level,jdbcType=INTEGER},
-      </if>
-      <if test="sortKey != null" >
-        #{sortKey,jdbcType=INTEGER},
-      </if>
-      <if test="orgName != null" >
-        #{orgName,jdbcType=VARCHAR},
-      </if>
-      <if test="orgParentId != null" >
-        #{orgParentId,jdbcType=VARCHAR},
       </if>
       <if test="recordState != null" >
         #{recordState,jdbcType=VARCHAR},
@@ -198,35 +166,23 @@
       </if>
     </trim>
   </insert>
-  <select id="countByExample" parameterType="com.kevin.model.SysOrgExample" resultType="java.lang.Integer" >
-    select count(*) from sys_org
+  <select id="countByExample" parameterType="com.kevin.model.SysUserOrgExample" resultType="java.lang.Integer" >
+    select count(*) from sys_user_org
     <if test="_parameter != null" >
       <include refid="Example_Where_Clause" />
     </if>
   </select>
   <update id="updateByExampleSelective" parameterType="map" >
-    update sys_org
+    update sys_user_org
     <set >
+      <if test="record.userOrgId != null" >
+        user_org_id = #{record.userOrgId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.userId != null" >
+        user_id = #{record.userId,jdbcType=VARCHAR},
+      </if>
       <if test="record.orgId != null" >
         org_id = #{record.orgId,jdbcType=VARCHAR},
-      </if>
-      <if test="record.expanded != null" >
-        expanded = #{record.expanded,jdbcType=BIT},
-      </if>
-      <if test="record.isleaf != null" >
-        isleaf = #{record.isleaf,jdbcType=BIT},
-      </if>
-      <if test="record.level != null" >
-        level = #{record.level,jdbcType=INTEGER},
-      </if>
-      <if test="record.sortKey != null" >
-        sort_key = #{record.sortKey,jdbcType=INTEGER},
-      </if>
-      <if test="record.orgName != null" >
-        org_name = #{record.orgName,jdbcType=VARCHAR},
-      </if>
-      <if test="record.orgParentId != null" >
-        org_parent_id = #{record.orgParentId,jdbcType=VARCHAR},
       </if>
       <if test="record.recordState != null" >
         record_state = #{record.recordState,jdbcType=VARCHAR},
@@ -249,14 +205,10 @@
     </if>
   </update>
   <update id="updateByExample" parameterType="map" >
-    update sys_org
-    set org_id = #{record.orgId,jdbcType=VARCHAR},
-      expanded = #{record.expanded,jdbcType=BIT},
-      isleaf = #{record.isleaf,jdbcType=BIT},
-      level = #{record.level,jdbcType=INTEGER},
-      sort_key = #{record.sortKey,jdbcType=INTEGER},
-      org_name = #{record.orgName,jdbcType=VARCHAR},
-      org_parent_id = #{record.orgParentId,jdbcType=VARCHAR},
+    update sys_user_org
+    set user_org_id = #{record.userOrgId,jdbcType=VARCHAR},
+      user_id = #{record.userId,jdbcType=VARCHAR},
+      org_id = #{record.orgId,jdbcType=VARCHAR},
       record_state = #{record.recordState,jdbcType=VARCHAR},
       create_user_id = #{record.createUserId,jdbcType=VARCHAR},
       create_time = #{record.createTime,jdbcType=DATE},
@@ -266,26 +218,14 @@
       <include refid="Update_By_Example_Where_Clause" />
     </if>
   </update>
-  <update id="updateByPrimaryKeySelective" parameterType="com.kevin.model.SysOrg" >
-    update sys_org
+  <update id="updateByPrimaryKeySelective" parameterType="com.kevin.model.SysUserOrg" >
+    update sys_user_org
     <set >
-      <if test="expanded != null" >
-        expanded = #{expanded,jdbcType=BIT},
+      <if test="userId != null" >
+        user_id = #{userId,jdbcType=VARCHAR},
       </if>
-      <if test="isleaf != null" >
-        isleaf = #{isleaf,jdbcType=BIT},
-      </if>
-      <if test="level != null" >
-        level = #{level,jdbcType=INTEGER},
-      </if>
-      <if test="sortKey != null" >
-        sort_key = #{sortKey,jdbcType=INTEGER},
-      </if>
-      <if test="orgName != null" >
-        org_name = #{orgName,jdbcType=VARCHAR},
-      </if>
-      <if test="orgParentId != null" >
-        org_parent_id = #{orgParentId,jdbcType=VARCHAR},
+      <if test="orgId != null" >
+        org_id = #{orgId,jdbcType=VARCHAR},
       </if>
       <if test="recordState != null" >
         record_state = #{recordState,jdbcType=VARCHAR},
@@ -303,21 +243,17 @@
         update_time = #{updateTime,jdbcType=DATE},
       </if>
     </set>
-    where org_id = #{orgId,jdbcType=VARCHAR}
+    where user_org_id = #{userOrgId,jdbcType=VARCHAR}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.kevin.model.SysOrg" >
-    update sys_org
-    set expanded = #{expanded,jdbcType=BIT},
-      isleaf = #{isleaf,jdbcType=BIT},
-      level = #{level,jdbcType=INTEGER},
-      sort_key = #{sortKey,jdbcType=INTEGER},
-      org_name = #{orgName,jdbcType=VARCHAR},
-      org_parent_id = #{orgParentId,jdbcType=VARCHAR},
+  <update id="updateByPrimaryKey" parameterType="com.kevin.model.SysUserOrg" >
+    update sys_user_org
+    set user_id = #{userId,jdbcType=VARCHAR},
+      org_id = #{orgId,jdbcType=VARCHAR},
       record_state = #{recordState,jdbcType=VARCHAR},
       create_user_id = #{createUserId,jdbcType=VARCHAR},
       create_time = #{createTime,jdbcType=DATE},
       update_user_id = #{updateUserId,jdbcType=VARCHAR},
       update_time = #{updateTime,jdbcType=DATE}
-    where org_id = #{orgId,jdbcType=VARCHAR}
+    where user_org_id = #{userOrgId,jdbcType=VARCHAR}
   </update>
 </mapper>

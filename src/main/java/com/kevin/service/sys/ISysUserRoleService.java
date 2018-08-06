@@ -42,5 +42,5 @@ public interface ISysUserRoleService extends ICommonService<SysUserRole> {
 	 * @param sysUser
 	 * @return
 	 */
-	public List<SysUserExt> queryUserExtListByRoleId(String roleId, SysUser sysUser);
+	List<SysUserExt> queryUserExtListByRoleId(String roleId, SysUser sysUser);
 }

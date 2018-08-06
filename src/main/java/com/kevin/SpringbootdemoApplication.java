@@ -49,7 +49,9 @@ public class SpringbootdemoApplication extends SpringBootServletInitializer {
         return application.sources(SpringbootdemoApplication.class);
     }
 
-    /*配置全局的CROS解决跨域问题*/
+    /**
+     * 配置全局的CROS解决跨域问题
+     */
     @Configuration
     public class CorsConfig {
         private CorsConfiguration buildConfig() {
@@ -61,16 +63,20 @@ public class SpringbootdemoApplication extends SpringBootServletInitializer {
              */
             corsConfiguration.setAllowCredentials(true);
             corsConfiguration.setMaxAge((long) 3600);
-            corsConfiguration.addAllowedOrigin("*"); // 1 设置访问源地址
-            corsConfiguration.addAllowedHeader("*"); // 2 设置访问源请求头
-            corsConfiguration.addAllowedMethod("*"); // 3 设置访问源请求方法
+            // 1 设置访问源地址
+            corsConfiguration.addAllowedOrigin("*");
+            // 2 设置访问源请求头
+            corsConfiguration.addAllowedHeader("*");
+            // 3 设置访问源请求方法
+            corsConfiguration.addAllowedMethod("*");
             return corsConfiguration;
         }
 
         @Bean
         public CorsFilter corsFilter() {
             UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-            source.registerCorsConfiguration("/**", buildConfig()); // 4 对接口配置跨域设置
+            // 4 对接口配置跨域设置
+            source.registerCorsConfiguration("/**", buildConfig());
             return new CorsFilter(source);
         }
     }
@@ -83,7 +89,14 @@ public class SpringbootdemoApplication extends SpringBootServletInitializer {
         FastJsonHttpMessageConverter fastConverter = new FastJsonHttpMessageConverter();
         //2、添加fastJson 的配置信息，比如：是否要格式化返回的json数据;
         FastJsonConfig fastJsonConfig = new FastJsonConfig();
-        fastJsonConfig.setSerializerFeatures(SerializerFeature.PrettyFormat);
+        // 空值特别处理
+        // WriteNullListAsEmpty 将Collection类型字段的字段空值输出为[]
+        // WriteNullStringAsEmpty 将字符串类型字段的空值输出为空字符串 ""
+        // WriteNullNumberAsZero 将数值类型字段的空值输出为0
+        // WriteNullBooleanAsFalse 将Boolean类型字段的空值输出为false
+        fastJsonConfig.setSerializerFeatures(SerializerFeature.PrettyFormat, SerializerFeature.WriteNullListAsEmpty,
+                SerializerFeature.WriteNullStringAsEmpty);
+        //fastJsonConfig.setSerializerFeatures(SerializerFeature.PrettyFormat);
         //3、在convert中添加配置信息.
         //处理中文乱码问题
         List<MediaType> fastMediaTypes = new ArrayList<>();

@@ -1,10 +1,11 @@
 package com.kevin.ctrl.sys;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.kevin.common.GlobalConstant.GlobalConstant;
-import com.kevin.common.core.HttpServletContext;
-import com.kevin.common.shiro.PasswordHelper;
 import com.kevin.common.utils.JsonResult;
 import com.kevin.model.SysUser;
 import com.kevin.model.ext.sys.SysUserExt;
@@ -12,15 +13,17 @@ import com.kevin.service.sys.ISysUserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author lzk
@@ -60,7 +63,7 @@ public class SysUserController {
 
     @RequestMapping(value = "/queryUserExtList", method = RequestMethod.POST)
     @ApiOperation(value = "查询用户所有信息（组织，角色信息)", notes = "查询用户所有信息（组织，角色信息)", code = 200, produces = "application/json")
-    public JsonResult userList(SysUserExt sysUserExt,
+    public JsonResult queryUserExtList(SysUser sysUser,
                                @ApiParam(name = "pageNum", required = false) @RequestParam(name = "pageNum", required = false, defaultValue = "1") int pageNum,
                                @ApiParam(name = "pageSize", required = false) @RequestParam(name = "pageSize", required = false, defaultValue = "10") int pageSize,
         @ApiParam(name = "pageHelper",value = "是否开启分页", required = false) @RequestParam(name = "pageHelper", required = false, defaultValue = "true") boolean pageHelper) {
@@ -70,8 +73,8 @@ public class SysUserController {
                 PageHelper.startPage(pageNum, pageSize);
             }
             PageHelper.startPage(pageNum, pageSize);
-            List<SysUserExt> userExtList = sysUserService.queryUserExtList(sysUserExt);
-            PageInfo<SysUserExt> pageInfo = new PageInfo<SysUserExt>(userExtList);
+            List<SysUserExt> userExtList = sysUserService.queryUserExtList(sysUser);
+            PageInfo<SysUserExt> pageInfo = new PageInfo<>(userExtList);
             jsonResult.setModel(pageInfo);
         } catch (Exception e) {
             e.printStackTrace();
@@ -83,7 +86,7 @@ public class SysUserController {
 
     @ApiOperation(value = "保存用户", notes = "保存用户", code = 200, produces = "application/json")
     @RequestMapping(value = "/saveUser", method = RequestMethod.POST)
-    public JsonResult userList(SysUser sysUser){
+    public JsonResult saveUser(SysUser sysUser){
         JsonResult jsonResult = new JsonResult();
         try {
             int result = sysUserService.save(sysUser);
@@ -99,7 +102,19 @@ public class SysUserController {
         return jsonResult;
     }
 
-    @RequestMapping(value = "/logicDeleteUser" , method = RequestMethod.POST)
+    @ApiOperation(value = "保存用户（包括部门，角色）", notes = "保存用户（包括部门，角色）", code = 200, produces = "application/json")
+    @RequestMapping(value = "/saveUserExt", method = RequestMethod.POST)
+    public JsonResult saveUserExt(SysUser sysUser,
+                                  @ApiParam(name = "orgId", required = false) @RequestParam(name = "orgId", required = false) String orgId,
+                                  @ApiParam(name = "roleIds", required = false) @RequestParam(name = "roleIds", required = false) String[] roleIds){
+        List<String> roleIdList = new ArrayList<>();
+        if(roleIds != null || roleIds.length != 0) {
+            roleIdList = Arrays.asList(roleIds);
+        }
+        return sysUserService.saveUserExt(sysUser,orgId,roleIdList);
+    }
+
+    @RequestMapping(value = "/deleteUser" , method = RequestMethod.POST)
     @ApiOperation(value = "删除用户", notes = "删除用户", code = 200, produces = "application/json")
     public JsonResult deleteUser(@ApiParam(name = "userId", required = true) @RequestParam(name = "userId", required = true) String userId) {
         JsonResult jsonResult = new JsonResult();
@@ -119,8 +134,8 @@ public class SysUserController {
     }
 
     @ApiOperation(value = "批量逻辑删除用户", notes = "批量逻辑删除用户", code = 200, produces = "application/json")
-    @RequestMapping(value = "/batchLogicDeleteUser", method = RequestMethod.POST)
-    public JsonResult batchLogicDeleteUser(@ApiParam(name = "userIds",value = "ids数组", required = true) @RequestParam(name = "userIds", required = true) String [] userIds){
+    @RequestMapping(value = "/batchDeleteUser", method = RequestMethod.POST)
+    public JsonResult batchDeleteUser(@ApiParam(name = "userIds",value = "ids数组", required = true) @RequestParam(name = "userIds", required = true) String [] userIds){
         JsonResult jsonResult = new JsonResult();
         try {
             List<String> list = Arrays.asList(userIds);
@@ -163,7 +178,6 @@ public class SysUserController {
     public JsonResult updateCurrUserPwd(
             @ApiParam(name = "oldUserPwd", required = true) @RequestParam(name = "oldUserPwd", required = true) String oldUserPwd,
             @ApiParam(name = "newUserPwd", required = true) @RequestParam(name = "newUserPwd", required = true) String newUserPwd) {
-
         return sysUserService.updateCurrtUserPwd(oldUserPwd, newUserPwd);
     }
 

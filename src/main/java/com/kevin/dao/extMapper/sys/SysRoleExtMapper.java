@@ -19,6 +19,13 @@ public interface SysRoleExtMapper {
     List<SysUserRole> queryRoleUserList(Map<String, Object> paramMap);
 
     /**
+     * 通过userId,roleIdList查询全部的关联（复用）
+     * @param paramMap
+     * @return
+     */
+    List<SysUserRole> queryUserRoleList(Map<String, Object> paramMap);
+
+    /**
      * 修改SysUserRole关联表中，某个角色下绑定的用户,删除状态改为使用（复用）
      * @param paramMap
      * @return

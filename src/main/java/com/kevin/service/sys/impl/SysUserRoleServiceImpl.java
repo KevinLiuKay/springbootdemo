@@ -126,12 +126,14 @@ public class SysUserRoleServiceImpl implements ISysUserRoleService {
             paramMap.put("roleId", roleId);
             //查询userRole关联表中，当前roleId绑定的所有用户
             List<SysUserRole> roleUserList = sysRoleExtMapper.queryRoleUserList(paramMap);
-            //将userRole关联表中，当前roleId下的所有用户逻辑删除
-            SysUserRole userRole = new SysUserRole();
-            userRole.setRoleId(roleId);
-            userRole.setUpdateUserId(currUser.getUserId());
-            userRole.setUpdateTime(Calendar.getInstance().getTime());
-            int delRoleUserResult = sysRoleExtMapper.deleteRoleUser(userRole);
+            if(roleUserList != null && !roleUserList.isEmpty()){
+                //将userRole关联表中，当前roleId下的所有用户逻辑删除
+                SysUserRole userRole = new SysUserRole();
+                userRole.setRoleId(roleId);
+                userRole.setUpdateUserId(currUser.getUserId());
+                userRole.setUpdateTime(Calendar.getInstance().getTime());
+                sysRoleExtMapper.deleteRoleUser(userRole);
+            }
             List<String> userRoleIdList = null;
             if (userIdList != null && !userIdList.isEmpty()) {
                 userRoleIdList = new ArrayList<String>();

@@ -1,6 +1,6 @@
 server: #server config
   servlet.context-path: /springbootdemo
-  port: 8080
+  port: 8888
 spring:
   main: #spring boot config
     show-banner: false #关闭bannev

@@ -10,7 +10,7 @@ public class SysUser {
     private String userName;
 
     private String userAcc;
-    /*
+    /**
      * serialize:是否需要序列化属性.
      */
     @JSONField(serialize=false)

@@ -7,14 +7,14 @@ import com.kevin.common.shiro.PasswordHelper;
 import com.kevin.common.utils.ExcelUtil;
 import com.kevin.common.utils.JsonResult;
 import com.kevin.common.utils.UUIDUtil;
+import com.kevin.dao.extMapper.sys.SysRoleExtMapper;
 import com.kevin.dao.extMapper.sys.SysUserExtMapper;
 import com.kevin.dao.mapper.SysUserMapper;
 import com.kevin.exception.CommonException;
-import com.kevin.model.SysUser;
-import com.kevin.model.SysUserExample;
+import com.kevin.model.*;
 import com.kevin.model.ext.sys.SysUserExt;
 import com.kevin.service.pub.IFileService;
-import com.kevin.service.sys.ISysUserService;
+import com.kevin.service.sys.*;
 import com.sun.xml.internal.messaging.saaj.util.ByteInputStream;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFCell;
@@ -26,6 +26,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
@@ -50,6 +51,14 @@ public class SysUserServiceImpl implements ISysUserService {
     private SysUserExtMapper sysUserExtMapper;
     @Resource
     private IFileService fileService;
+    @Resource
+    private ISysOrgService sysOrgService;
+    @Resource
+    private ISysUserOrgService sysUserOrgService;
+    @Resource
+    private SysRoleExtMapper sysRoleExtMapper;
+    @Resource
+    private ISysUserRoleService sysUserRoleService;
 
 //    @Autowired
 //    private RedisUtil redisUtil;
@@ -298,7 +307,136 @@ public class SysUserServiceImpl implements ISysUserService {
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("sysUser", sysUser);
         map.put("orderByClause", "u.create_time DESC");
-        return sysUserExtMapper.queryUserExtList(map);
+        //查询用户和部门信息
+        List<SysUserExt> userExtList = sysUserExtMapper.queryUserExtList(map);
+        List<String> userIds = new ArrayList<String>();
+        if(userExtList != null || !userExtList.isEmpty()){
+            for(SysUserExt userExt: userExtList) {
+                userIds.add(userExt.getUserId());
+            }
+            //根据用户userIdList查询所有用户角色（避免一对多分页问题）
+            List<SysUserExt> userRoleList = queryUserRoleList(userIds);
+            //userId 对应的RoleList放在Map中
+            if(userRoleList != null && !userRoleList.isEmpty()) {
+                Map<String, List<SysRole>> userExtMap = new HashMap<>();
+                for (SysUserExt ext : userRoleList) {
+                    userExtMap.put(ext.getUserId() , ext.getRoleList());
+                }
+                //从Map中取出RoleList set到用户列表（包括部门信息）
+                for(SysUserExt userExt: userExtList) {
+                    userExt.setRoleList(userExtMap.get(userExt.getUserId()));
+                }
+            }
+        }
+        return userExtList;
+    }
+
+    @Override
+    public JsonResult saveUserExt(SysUser sysUser, String orgId, List<String> roleIds) {
+        JsonResult jsonResult = new JsonResult();
+        jsonResult.setStatus(false);
+        jsonResult.setMessage(GlobalConstant.SAVE_FAIL);
+        try {
+            SysUser user = new SysUser();
+            //保存用户信息
+            if(sysUser != null) {
+                int savaUserResult = save(sysUser);
+                BeanUtils.copyProperties(sysUser,user);
+                throwException(savaUserResult, "'保存用户表失败!");
+            }
+            //保存用户部门关联表信息
+            if(StringUtils.isNotBlank(user.getUserId()) && StringUtils.isNotBlank(orgId)){
+                SysUserOrg sysUserOrg = new SysUserOrg();
+                sysUserOrg.setUserId(user.getUserId());
+                sysUserOrg.setOrgId(orgId);
+                //查询用户组织关联表中是否存在记录
+                List<SysUserOrg> userOrgList =  sysUserOrgService.queryList(sysUserOrg,"");
+                if(userOrgList != null && !userOrgList.isEmpty()){
+                    SysUserOrg userOrg = userOrgList.get(0);
+                    sysUserOrg.setUserOrgId(userOrg.getUserOrgId());
+                }
+                int saveUserOrgResult = sysUserOrgService.save(sysUserOrg);
+                throwException(saveUserOrgResult, "'保存用户组织关联表失败!");
+            }
+            //保存用户角色关联信息
+            SysUser currUser = HttpServletContext.getCurrentUser();
+            if(currUser == null) {
+                throw new CommonException(GlobalConstant.SESSION_OUT_TIME);
+            }
+            if(StringUtils.isNotBlank(user.getUserId()) && roleIds != null && !roleIds.isEmpty()) {
+                int result = GlobalConstant.ZERO;
+                SysUserRole sysUserRole = null;
+                //查询用户角色关联表中是否存在记录
+                Map<String, Object> paramMap = new HashMap<String, Object>();
+                paramMap.put("userId", user.getUserId());
+                paramMap.put("roleIdList", roleIds);
+                List<SysUserRole> userRoleList =  sysRoleExtMapper.queryUserRoleList(paramMap);
+                if(userRoleList != null && !userRoleList.isEmpty()){
+                    //将userRole关联表中，当前userId下的所有角色逻辑删除
+                    SysUserRole userRole = new SysUserRole();
+                    userRole.setUserId(user.getUserId());
+                    userRole.setUpdateUserId(currUser.getUserId());
+                    userRole.setUpdateTime(Calendar.getInstance().getTime());
+                    sysRoleExtMapper.deleteRoleUser(userRole);
+                }
+                List<String> userRoleIdList = null;
+                userRoleIdList = new ArrayList<String>();
+                for (String roleId : roleIds) {
+                    // 是否新增 false：不新增 true:新增
+                    boolean insert = true;
+                    // 数据库不为空
+                    if (userRoleList != null && !userRoleList.isEmpty()) {
+                        for (SysUserRole existUR : userRoleList) {
+                            if (existUR.getUserId().equals(roleId)) {
+                                sysUserRole = existUR;
+                                insert = false;
+                                break;
+                            }
+                        }
+                        // 新增
+                        if (insert) {
+                            sysUserRole = new SysUserRole();
+                            sysUserRole.setRoleId(roleId);
+                            sysUserRole.setUserId(user.getUserId());
+                            result += sysUserRoleService.save(sysUserRole);
+                        } else {
+                            // 需要修改N为Y的userRoleId集合
+                            String userRoleId = sysUserRole.getUserRoleId();
+                            userRoleIdList.add(userRoleId);
+                        }
+                    } else {// 数据库空
+                        sysUserRole = new SysUserRole();
+                        sysUserRole.setRoleId(roleId);
+                        sysUserRole.setUserId(user.getUserId());
+                        result += sysUserRoleService.save(sysUserRole);
+                    }
+                }
+                //将userRole关联表中，当前userId下需要绑定的角色的如果已存在数据库的N状态改为Y（复用）
+                if (userRoleIdList != null && !userRoleIdList.isEmpty()) {
+                    Map<String, Object> map = new HashMap<String, Object>();
+                    map.put("currUserId", currUser.getUserId());
+                    map.put("userRoleIdList", userRoleIdList);
+                    result += sysRoleExtMapper.updateRecordStateN2Y(map);
+                }
+            }
+            jsonResult.setStatus(true);
+            jsonResult.setMessage(GlobalConstant.SAVE_SUCCESSED);
+        }catch (Exception e) {
+            e.printStackTrace();
+            jsonResult.setStatus(false);
+            jsonResult.setMessage(e.getClass().getName() + ":" + e.getMessage());
+        }
+        return jsonResult;
+    }
+
+    @Override
+    public List<SysUserExt> queryUserRoleList(List<String> list) {
+        if(list != null && !list.isEmpty()) {
+            Map<String, Object> map = new HashMap<String, Object>();
+            map.put("list",list);
+            return sysUserExtMapper.queryUserRoleList(map);
+        }
+        return null;
     }
 
 
@@ -425,5 +563,9 @@ public class SysUserServiceImpl implements ISysUserService {
 		}
 		return null;
 	}
-
+    public void throwException(int result,String name){
+        if (result == 0) {
+            throw new RuntimeException(name);
+        }
+    }
 }
