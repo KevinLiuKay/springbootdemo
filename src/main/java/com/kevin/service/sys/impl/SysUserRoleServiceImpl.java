@@ -122,7 +122,6 @@ public class SysUserRoleServiceImpl implements ISysUserRoleService {
             int result = GlobalConstant.ZERO;
             SysUserRole sysUserRole = null;
             Map<String, Object> paramMap = new HashMap<String, Object>();
-            paramMap.put("userIdList", userIdList);
             paramMap.put("roleId", roleId);
             //查询userRole关联表中，当前roleId绑定的所有用户
             List<SysUserRole> roleUserList = sysRoleExtMapper.queryRoleUserList(paramMap);
@@ -171,6 +170,7 @@ public class SysUserRoleServiceImpl implements ISysUserRoleService {
                 if (userRoleIdList != null && !userRoleIdList.isEmpty()) {
                     Map<String, Object> map = new HashMap<String, Object>();
                     map.put("currUserId", currUser.getUserId());
+                    map.put("updateTime", Calendar.getInstance().getTime());
                     map.put("userRoleIdList", userRoleIdList);
                     result += sysRoleExtMapper.updateRecordStateN2Y(map);
                 }

@@ -49,7 +49,7 @@ public class SysUserOrgServiceImpl implements ISysUserOrgService {
             //set
             sysUserOrg.setRecordState(GlobalConstant.N);
             //where
-            sysUserOrg.setUserId(id);
+            sysUserOrg.setUserOrgId(id);
             return save(sysUserOrg);
         }
         return GlobalConstant.ZERO;

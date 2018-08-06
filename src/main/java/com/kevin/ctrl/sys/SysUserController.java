@@ -108,7 +108,7 @@ public class SysUserController {
                                   @ApiParam(name = "orgId", required = false) @RequestParam(name = "orgId", required = false) String orgId,
                                   @ApiParam(name = "roleIds", required = false) @RequestParam(name = "roleIds", required = false) String[] roleIds){
         List<String> roleIdList = new ArrayList<>();
-        if(roleIds != null || roleIds.length != 0) {
+        if(roleIds != null) {
             roleIdList = Arrays.asList(roleIds);
         }
         return sysUserService.saveUserExt(sysUser,orgId,roleIdList);
