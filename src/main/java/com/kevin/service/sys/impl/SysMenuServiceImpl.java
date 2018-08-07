@@ -3,11 +3,13 @@ package com.kevin.service.sys.impl;
 import com.kevin.common.GlobalConstant.GlobalConstant;
 import com.kevin.common.core.GeneralMethod;
 import com.kevin.common.utils.UUIDUtil;
+import com.kevin.dao.extMapper.sys.SysMenuExtMapper;
 import com.kevin.dao.mapper.SysMenuMapper;
 import com.kevin.model.SysMenu;
 import com.kevin.model.SysMenuExample;
 import com.kevin.model.ext.sys.SysMenuExt;
 import com.kevin.service.sys.ISysMenuService;
+import com.kevin.service.sys.ISysRoleMenuService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -16,10 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author lzk
@@ -31,6 +30,10 @@ public class SysMenuServiceImpl implements ISysMenuService {
 
     @Resource
     private SysMenuMapper sysMenuMapper;
+    @Resource
+    private SysMenuExtMapper sysMenuExtMapper;
+    @Resource
+    private ISysRoleMenuService sysRoleMenuService;
 
     @Override
     public int save(SysMenu sysMenu) {
@@ -120,5 +123,39 @@ public class SysMenuServiceImpl implements ISysMenuService {
             menuTree = root.getChildren();
         }
         return menuTree;
+    }
+
+    @Override
+    public List<SysMenuExt> queryMenuTreeByRoleId(String roleId) {
+        List<SysMenuExt> menuTree = null;
+        if(StringUtils.isNotBlank(roleId)) {
+            List<String> list = new ArrayList<>();
+            list.add(roleId);
+            List<SysMenuExt> menuList = sysMenuExtMapper.queryMenuByRoleId(list);
+            if (null != menuList && !menuList.isEmpty()) {
+                // 创建根节点
+                SysMenuExt root = new SysMenuExt();
+                // 组装Map数据
+                Map<String, SysMenuExt> dataMap = new HashMap<String, SysMenuExt>();
+                for (SysMenuExt sysMenuExt : menuList) {
+                    dataMap.put(sysMenuExt.getMenuId(), sysMenuExt);
+                }
+                // 组装树形结构
+                Set<Map.Entry<String, SysMenuExt>> entrySet = dataMap.entrySet();
+                for (Map.Entry<String, SysMenuExt> entry : entrySet) {
+                    SysMenuExt menu = entry.getValue();
+                    if (null == menu.getMenuParentId() || ("0").equals(menu.getMenuParentId())) {
+                        root.getChildren().add(menu);
+                    } else {
+                        dataMap.get(menu.getMenuParentId()).getChildren().add(menu);
+                    }
+                }
+                // 对树形结构进行二叉树排序
+                root.sortChildren();
+                menuTree = root.getChildren();
+            }
+            return menuTree;
+        }
+        return null;
     }
 }

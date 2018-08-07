@@ -21,6 +21,8 @@ spring:
    testOnBorrow: true
    testWhileIdle: true
    timeBetweenEvictionRunsMillis: 60000
+   transaction:
+        rollback-on-commit-failure: true
    #配置rabbitmq连接
    rabbitmq:
        host: localhost

@@ -30,12 +30,29 @@ public class SysMenuController {
     @Autowired
     private ISysMenuService sysMenuService;
 
-    @ApiOperation(value = "查询菜单树", notes = "查询菜单树", code = 200, produces = "application/json")
+    @ApiOperation(value = "查询全部菜单树", notes = "查询全部菜单树", code = 200, produces = "application/json")
     @RequestMapping(value = "/queryMenuTree", method = RequestMethod.POST)
     public JsonResult queryMenuTree(SysMenu sysMenu){
         JsonResult jsonResult = new JsonResult();
         try {
             List<SysMenuExt> menuTree = sysMenuService.queryMenuTree(sysMenu);
+            jsonResult.setStatus(true);
+            jsonResult.setMessage(GlobalConstant.OPERATE_SUCCESSED);
+            jsonResult.setModel(menuTree);
+        } catch (Exception e) {
+            e.printStackTrace();
+            jsonResult.setStatus(false);
+            jsonResult.setMessage(e.getClass().getName() + ":" + e.getMessage());
+        }
+        return jsonResult;
+    }
+
+    @ApiOperation(value = "根据roleId查询菜单树", notes = "根据roleId查询菜单树", code = 200, produces = "application/json")
+    @RequestMapping(value = "/queryMenuTreeByRoleId", method = RequestMethod.POST)
+    public JsonResult queryMenuTreeByRoleId(@ApiParam(name = "roleId", required = true) @RequestParam(name = "roleId", required = true) String roleId){
+        JsonResult jsonResult = new JsonResult();
+        try {
+            List<SysMenuExt> menuTree = sysMenuService.queryMenuTreeByRoleId(roleId);
             jsonResult.setStatus(true);
             jsonResult.setMessage(GlobalConstant.OPERATE_SUCCESSED);
             jsonResult.setModel(menuTree);

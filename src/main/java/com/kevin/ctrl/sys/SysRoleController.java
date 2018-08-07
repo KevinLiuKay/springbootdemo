@@ -119,7 +119,7 @@ public class SysRoleController {
     }
 
     @RequestMapping(value = "/saveRoleUserList", method = { RequestMethod.POST})
-    @ApiOperation(value = "保存用户角色关联表", notes = "保存用户角色关联表", code = 200, produces = "application/json")
+    @ApiOperation(value = "角色配置用户", notes = "角色配置用户", code = 200, produces = "application/json")
     public JsonResult saveRoleUserList(
             @ApiParam(name = "userIds",value = "ids数组", required = false) @RequestParam(name = "userIds", required = false) String [] userIds,
             @ApiParam(name = "roleId", required = true) @RequestParam(name = "roleId", required = true) String roleId) {
@@ -129,14 +129,7 @@ public class SysRoleController {
             if(userIds != null) {
                 userIdList = Arrays.asList(userIds);
             }
-            int result = sysUserRoleService.saveRoleUserList(userIdList, roleId);
-            if (GlobalConstant.ZERO != result) {
-                jsonResult.setStatus(true);
-                jsonResult.setMessage(GlobalConstant.SAVE_SUCCESSED);
-            } else {
-                jsonResult.setStatus(false);
-                jsonResult.setMessage(GlobalConstant.SAVE_FAIL);
-            }
+            return sysUserRoleService.saveRoleUserList(userIdList, roleId);
         }catch (Exception e) {
             e.printStackTrace();
             jsonResult.setStatus(false);

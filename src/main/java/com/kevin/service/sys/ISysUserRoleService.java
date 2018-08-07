@@ -1,5 +1,6 @@
 package com.kevin.service.sys;
 
+import com.kevin.common.utils.JsonResult;
 import com.kevin.model.SysUser;
 import com.kevin.model.SysUserRole;
 import com.kevin.model.ext.sys.SysUserExt;
@@ -25,7 +26,7 @@ public interface ISysUserRoleService extends ICommonService<SysUserRole> {
 	 * @param roleId
 	 * @return
 	 */
-	int saveRoleUserList(List<String> userIdList, String roleId)throws Exception;
+	JsonResult saveRoleUserList(List<String> userIdList, String roleId)throws Exception;
 
 	/**
 	 * 为角色删除用户

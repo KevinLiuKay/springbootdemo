@@ -41,7 +41,7 @@ import java.util.*;
  * @author lzk
  */
 @Service
-@Transactional(rollbackFor = Exception.class)
+@Transactional(rollbackFor=Exception.class)
 public class SysUserServiceImpl implements ISysUserService {
     private static Logger logger = LoggerFactory.getLogger(SysUserServiceImpl.class);
 
@@ -335,7 +335,6 @@ public class SysUserServiceImpl implements ISysUserService {
     public JsonResult saveUserExt(SysUser sysUser, String orgId, List<String> roleIds) {
         JsonResult jsonResult = new JsonResult();
         jsonResult.setStatus(false);
-        jsonResult.setMessage(GlobalConstant.SAVE_FAIL);
         try {
             SysUser currUser = HttpServletContext.getCurrentUser();
             if(currUser == null) {
@@ -362,7 +361,8 @@ public class SysUserServiceImpl implements ISysUserService {
             }
             //orgId为空，但数据库存在用户组织之前的关联，删除关联
             if(StringUtils.isBlank(orgId) && StringUtils.isNotBlank(sysUserOrg.getUserOrgId())){
-                sysUserOrgService.logicallyDeleteById(sysUserOrg.getUserOrgId());
+                int deleteUserOrgResult = sysUserOrgService.logicallyDeleteById(sysUserOrg.getUserOrgId());
+                throwException(deleteUserOrgResult, "删除用户组织关联表失败!");
             }
             //org不为空，则保存用户组织关联关系
             if(StringUtils.isNotBlank(orgId)){
@@ -382,11 +382,11 @@ public class SysUserServiceImpl implements ISysUserService {
                 userRole.setUserId(user.getUserId());
                 userRole.setUpdateUserId(currUser.getUserId());
                 userRole.setUpdateTime(Calendar.getInstance().getTime());
-                sysRoleExtMapper.deleteRoleUser(userRole);
+                throwException(sysRoleExtMapper.deleteRoleUser(userRole), "删除用户组织关联表失败!");
             }
+            SysUserRole sysUserRole = null;
             if(roleIds != null && !roleIds.isEmpty()) {
                 int result = GlobalConstant.ZERO;
-                SysUserRole sysUserRole = null;
                 List<String> userRoleIdList = new ArrayList<String>();
                 for (String roleId : roleIds) {
                     // 是否新增 false：不新增 true:新增
@@ -407,26 +407,21 @@ public class SysUserServiceImpl implements ISysUserService {
                             sysUserRole.setUserId(user.getUserId());
                             result += sysUserRoleService.save(sysUserRole);
                         } else {
-                            // 需要修改N为Y的userRoleId集合
-                            String userRoleId = sysUserRole.getUserRoleId();
-                            userRoleIdList.add(userRoleId);
+                            // 修改
+                            sysUserRole.setRecordState(GlobalConstant.Y);
+                            sysUserRole.setUpdateUserId(currUser.getUserId());
+                            sysUserRole.setUpdateTime(Calendar.getInstance().getTime());
+                            result += sysUserRoleService.save(sysUserRole);
                         }
-                    } else {// 数据库空
+                    } else {
+                        // 存在部分不需要的用户角色，删除后全部新增
                         sysUserRole = new SysUserRole();
                         sysUserRole.setRoleId(roleId);
-                        sysUserRole.setUserId(user.getUserId());
+                        sysUserRole.setUserId(sysUser.getUserId());
                         result += sysUserRoleService.save(sysUserRole);
                     }
+                    throwException(result, "保存用户角色关联表失败!");
                 }
-                //将userRole关联表中，当前userId下需要绑定的角色的如果已存在数据库的N状态改为Y（复用）
-                if (userRoleIdList != null && !userRoleIdList.isEmpty()) {
-                    Map<String, Object> map = new HashMap<String, Object>();
-                    map.put("currUserId", currUser.getUserId());
-                    map.put("updateTime", Calendar.getInstance().getTime());
-                    map.put("userRoleIdList", userRoleIdList);
-                    result += sysRoleExtMapper.updateRecordStateN2Y(map);
-                }
-                throwException(result, "保存用户角色关联表失败!");
             }
             jsonResult.setStatus(true);
             jsonResult.setMessage(GlobalConstant.SAVE_SUCCESSED);

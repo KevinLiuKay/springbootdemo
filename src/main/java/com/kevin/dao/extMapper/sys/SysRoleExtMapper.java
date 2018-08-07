@@ -1,14 +1,13 @@
 package com.kevin.dao.extMapper.sys;
 
-import com.kevin.model.SysRole;
-import com.kevin.model.SysUser;
 import com.kevin.model.SysUserRole;
-import com.kevin.model.ext.sys.SysRoleExt;
 import com.kevin.model.ext.sys.SysUserExt;
-
 import java.util.List;
 import java.util.Map;
 
+/**
+ * @author lzk
+ */
 public interface SysRoleExtMapper {
 
     /**
