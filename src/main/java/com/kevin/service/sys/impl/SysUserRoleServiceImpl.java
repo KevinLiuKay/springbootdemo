@@ -115,12 +115,12 @@ public class SysUserRoleServiceImpl implements ISysUserRoleService {
     }
 
     @Override
-    public JsonResult saveRoleUserList(List<String> userIdList, String roleId) throws Exception {
+    public JsonResult saveRoleUserList(List<String> userIdList, String roleId) {
         JsonResult jsonResult = new JsonResult();
         jsonResult.setStatus(false);
         SysUser currUser = HttpServletContext.getCurrentUser();
         if(currUser == null) {
-            throw new CommonException(GlobalConstant.SESSION_OUT_TIME);
+            throwException(GlobalConstant.ZERO,GlobalConstant.SESSION_OUT_TIME);
         }
         if(StringUtils.isNotBlank(roleId)) {
             SysUserRole userRole = new SysUserRole();
@@ -128,10 +128,10 @@ public class SysUserRoleServiceImpl implements ISysUserRoleService {
             //查询userRole关联表中，当前roleId绑定的所有用户
             List<SysUserRole> roleUserList = queryList(userRole,"");
             /**
-             * userIds不为空分两种情况
+             * userIds不为空分3种情况
              * 1.roleUser存在部分需要配置的用户角色信息（复用那部分存在的用户角色信息，其他新增）
              * 2.roleUser存在部分不需要的用户角色信息（删除那部分存在的不需要的用户角色信息，新增全部）
-             * 2.roleUser不存在需要配置的用户角色信息 （新增全部）
+             * 3.roleUser不存在需要配置的用户角色信息 （新增全部）
              */
             if(userIdList != null && !userIdList.isEmpty()){
                 //数据库userRole关联表中存在记录
@@ -215,13 +215,16 @@ public class SysUserRoleServiceImpl implements ISysUserRoleService {
     }
 
     @Override
-    public int deleteRoleUser(String userId, String roleId) throws Exception{
+    public JsonResult deleteRoleUser(String userId, String roleId) {
+        JsonResult jsonResult = new JsonResult();
+        jsonResult.setStatus(false);
         if (StringUtils.isBlank(roleId)) {
-            return GlobalConstant.ZERO;
+            jsonResult.setMessage(GlobalConstant.PARAM_IS_EMPTY);
+            return jsonResult;
         }
         SysUser currUser = HttpServletContext.getCurrentUser();
         if(currUser == null) {
-            throw new CommonException(GlobalConstant.SESSION_OUT_TIME);
+            throwException(GlobalConstant.ZERO,GlobalConstant.SESSION_OUT_TIME);
         }
         SysUserRole sysUserRole = new SysUserRole();
         sysUserRole.setRoleId(roleId);
@@ -230,11 +233,12 @@ public class SysUserRoleServiceImpl implements ISysUserRoleService {
             sysUserRole.setUserId(userId);
             sysUserRole.setUpdateUserId(currUser.getUserId());
             sysUserRole.setUpdateTime(Calendar.getInstance().getTime());
-            return sysRoleExtMapper.deleteRoleUser(sysUserRole);
-        } else {
-            throw new CommonException("删除数据不存在");
-        }
+            throwException(sysRoleExtMapper.deleteRoleUser(sysUserRole),"删除用户角色关联表失败");
 
+        }
+        jsonResult.setStatus(true);
+        jsonResult.setMessage(GlobalConstant.DELETE_SUCCESSED);
+        return jsonResult;
     }
 
     @Override

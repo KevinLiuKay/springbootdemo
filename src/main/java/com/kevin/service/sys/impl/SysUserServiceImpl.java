@@ -31,6 +31,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import javax.annotation.Resource;
@@ -335,101 +336,95 @@ public class SysUserServiceImpl implements ISysUserService {
     public JsonResult saveUserExt(SysUser sysUser, String orgId, List<String> roleIds) {
         JsonResult jsonResult = new JsonResult();
         jsonResult.setStatus(false);
-        try {
-            SysUser currUser = HttpServletContext.getCurrentUser();
-            if(currUser == null) {
-                throw new CommonException(GlobalConstant.SESSION_OUT_TIME);
+        SysUser currUser = HttpServletContext.getCurrentUser();
+        if(currUser == null) {
+            throwException(GlobalConstant.ZERO,GlobalConstant.SESSION_OUT_TIME);
+        }
+        SysUser user = new SysUser();
+        //保存用户信息
+        if(sysUser != null) {
+            int savaUserResult = save(sysUser);
+            BeanUtils.copyProperties(sysUser,user);
+            throwException(savaUserResult, "保存用户表失败!");
+        }
+        //保存用户部门关联表信息
+        //查询用户部门关联表中是否存在记录
+        SysUserOrg sysUserOrg = new SysUserOrg();
+        if(StringUtils.isNotBlank(user.getUserId())) {
+            sysUserOrg.setUserId(user.getUserId());
+            //查询用户组织关联表中是否存在记录
+            List<SysUserOrg> userOrgList =  sysUserOrgService.queryList(sysUserOrg,"");
+            if(userOrgList != null && !userOrgList.isEmpty()){
+                SysUserOrg userOrg = userOrgList.get(0);
+                sysUserOrg.setUserOrgId(userOrg.getUserOrgId());
             }
-            SysUser user = new SysUser();
-            //保存用户信息
-            if(sysUser != null) {
-                int savaUserResult = save(sysUser);
-                BeanUtils.copyProperties(sysUser,user);
-                throwException(savaUserResult, "保存用户表失败!");
-            }
-            //保存用户部门关联表信息
-            //查询用户部门关联表中是否存在记录
-            SysUserOrg sysUserOrg = new SysUserOrg();
-            if(StringUtils.isNotBlank(user.getUserId())) {
-                sysUserOrg.setUserId(user.getUserId());
-                //查询用户组织关联表中是否存在记录
-                List<SysUserOrg> userOrgList =  sysUserOrgService.queryList(sysUserOrg,"");
-                if(userOrgList != null && !userOrgList.isEmpty()){
-                    SysUserOrg userOrg = userOrgList.get(0);
-                    sysUserOrg.setUserOrgId(userOrg.getUserOrgId());
-                }
-            }
-            //orgId为空，但数据库存在用户组织之前的关联，删除关联
-            if(StringUtils.isBlank(orgId) && StringUtils.isNotBlank(sysUserOrg.getUserOrgId())){
-                int deleteUserOrgResult = sysUserOrgService.logicallyDeleteById(sysUserOrg.getUserOrgId());
-                throwException(deleteUserOrgResult, "删除用户组织关联表失败!");
-            }
-            //org不为空，则保存用户组织关联关系
-            if(StringUtils.isNotBlank(orgId)){
-                sysUserOrg.setOrgId(orgId);
-                sysUserOrg.setRecordState(GlobalConstant.Y);
-                int saveUserOrgResult = sysUserOrgService.save(sysUserOrg);
-                throwException(saveUserOrgResult, "保存用户组织关联表失败!");
-            }
-            //保存用户角色关联信息
-            //查询用户角色关联表中是否存在记录
-            Map<String, Object> paramMap = new HashMap<String, Object>();
-            paramMap.put("userId", user.getUserId());
-            List<SysUserRole> userRoleList =  sysRoleExtMapper.queryUserRoleList(paramMap);
-            if(userRoleList != null && !userRoleList.isEmpty()){
-                //将userRole关联表中，当前userId下的所有角色逻辑删除
-                SysUserRole userRole = new SysUserRole();
-                userRole.setUserId(user.getUserId());
-                userRole.setUpdateUserId(currUser.getUserId());
-                userRole.setUpdateTime(Calendar.getInstance().getTime());
-                throwException(sysRoleExtMapper.deleteRoleUser(userRole), "删除用户组织关联表失败!");
-            }
-            SysUserRole sysUserRole = null;
-            if(roleIds != null && !roleIds.isEmpty()) {
-                int result = GlobalConstant.ZERO;
-                List<String> userRoleIdList = new ArrayList<String>();
-                for (String roleId : roleIds) {
-                    // 是否新增 false：不新增 true:新增
-                    boolean insert = true;
-                    // 数据库不为空
-                    if (userRoleList != null && !userRoleList.isEmpty()) {
-                        for (SysUserRole existUR : userRoleList) {
-                            if (existUR.getRoleId().equals(roleId)) {
-                                sysUserRole = existUR;
-                                insert = false;
-                                break;
-                            }
+        }
+        //orgId为空，但数据库存在用户组织之前的关联，删除关联
+        if(StringUtils.isBlank(orgId) && StringUtils.isNotBlank(sysUserOrg.getUserOrgId())){
+            int deleteUserOrgResult = sysUserOrgService.logicallyDeleteById(sysUserOrg.getUserOrgId());
+            throwException(deleteUserOrgResult, "删除用户组织关联表失败!");
+        }
+        //org不为空，则保存用户组织关联关系
+        if(StringUtils.isNotBlank(orgId)){
+            sysUserOrg.setOrgId(orgId);
+            sysUserOrg.setRecordState(GlobalConstant.Y);
+            int saveUserOrgResult = sysUserOrgService.save(sysUserOrg);
+            throwException(saveUserOrgResult, "保存用户组织关联表失败!");
+        }
+        //保存用户角色关联信息
+        //查询用户角色关联表中是否存在记录
+        Map<String, Object> paramMap = new HashMap<String, Object>();
+        paramMap.put("userId", user.getUserId());
+        List<SysUserRole> userRoleList =  sysRoleExtMapper.queryUserRoleList(paramMap);
+        if(userRoleList != null && !userRoleList.isEmpty()){
+            //将userRole关联表中，当前userId下的所有角色逻辑删除
+            SysUserRole userRole = new SysUserRole();
+            userRole.setUserId(user.getUserId());
+            userRole.setUpdateUserId(currUser.getUserId());
+            userRole.setUpdateTime(Calendar.getInstance().getTime());
+            throwException(sysRoleExtMapper.deleteRoleUser(userRole), "删除用户组织关联表失败!");
+        }
+        SysUserRole sysUserRole = null;
+        if(roleIds != null && !roleIds.isEmpty()) {
+            int result = GlobalConstant.ZERO;
+            List<String> userRoleIdList = new ArrayList<String>();
+            for (String roleId : roleIds) {
+                // 是否新增 false：不新增 true:新增
+                boolean insert = true;
+                // 数据库不为空
+                if (userRoleList != null && !userRoleList.isEmpty()) {
+                    for (SysUserRole existUR : userRoleList) {
+                        if (existUR.getRoleId().equals(roleId)) {
+                            sysUserRole = existUR;
+                            insert = false;
+                            break;
                         }
-                        // 新增
-                        if (insert) {
-                            sysUserRole = new SysUserRole();
-                            sysUserRole.setRoleId(roleId);
-                            sysUserRole.setUserId(user.getUserId());
-                            result += sysUserRoleService.save(sysUserRole);
-                        } else {
-                            // 修改
-                            sysUserRole.setRecordState(GlobalConstant.Y);
-                            sysUserRole.setUpdateUserId(currUser.getUserId());
-                            sysUserRole.setUpdateTime(Calendar.getInstance().getTime());
-                            result += sysUserRoleService.save(sysUserRole);
-                        }
-                    } else {
-                        // 存在部分不需要的用户角色，删除后全部新增
+                    }
+                    // 新增
+                    if (insert) {
                         sysUserRole = new SysUserRole();
                         sysUserRole.setRoleId(roleId);
-                        sysUserRole.setUserId(sysUser.getUserId());
+                        sysUserRole.setUserId(user.getUserId());
+                        result += sysUserRoleService.save(sysUserRole);
+                    } else {
+                        // 修改
+                        sysUserRole.setRecordState(GlobalConstant.Y);
+                        sysUserRole.setUpdateUserId(currUser.getUserId());
+                        sysUserRole.setUpdateTime(Calendar.getInstance().getTime());
                         result += sysUserRoleService.save(sysUserRole);
                     }
-                    throwException(result, "保存用户角色关联表失败!");
+                } else {
+                    // 存在部分不需要的用户角色，删除后全部新增
+                    sysUserRole = new SysUserRole();
+                    sysUserRole.setRoleId(roleId);
+                    sysUserRole.setUserId(sysUser.getUserId());
+                    result += sysUserRoleService.save(sysUserRole);
                 }
+                throwException(result, "保存用户角色关联表失败!");
             }
-            jsonResult.setStatus(true);
-            jsonResult.setMessage(GlobalConstant.SAVE_SUCCESSED);
-        }catch (Exception e) {
-            e.printStackTrace();
-            jsonResult.setStatus(false);
-            jsonResult.setMessage(e.getClass().getName() + ":" + e.getMessage());
         }
+        jsonResult.setStatus(true);
+        jsonResult.setMessage(GlobalConstant.SAVE_SUCCESSED);
         return jsonResult;
     }
 

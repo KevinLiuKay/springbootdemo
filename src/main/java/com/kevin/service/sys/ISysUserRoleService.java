@@ -26,7 +26,7 @@ public interface ISysUserRoleService extends ICommonService<SysUserRole> {
 	 * @param roleId
 	 * @return
 	 */
-	JsonResult saveRoleUserList(List<String> userIdList, String roleId)throws Exception;
+	JsonResult saveRoleUserList(List<String> userIdList, String roleId);
 
 	/**
 	 * 为角色删除用户
@@ -34,7 +34,7 @@ public interface ISysUserRoleService extends ICommonService<SysUserRole> {
 	 * @param roleId
 	 * @return
 	 */
-	int deleteRoleUser(String userId, String roleId) throws Exception;
+	JsonResult deleteRoleUser(String userId, String roleId);
 
 
 	/**

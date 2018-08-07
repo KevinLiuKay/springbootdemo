@@ -123,19 +123,11 @@ public class SysRoleController {
     public JsonResult saveRoleUserList(
             @ApiParam(name = "userIds",value = "ids数组", required = false) @RequestParam(name = "userIds", required = false) String [] userIds,
             @ApiParam(name = "roleId", required = true) @RequestParam(name = "roleId", required = true) String roleId) {
-        JsonResult jsonResult = new JsonResult();
-        try {
-            List<String> userIdList = new ArrayList<String>();
-            if(userIds != null) {
-                userIdList = Arrays.asList(userIds);
-            }
-            return sysUserRoleService.saveRoleUserList(userIdList, roleId);
-        }catch (Exception e) {
-            e.printStackTrace();
-            jsonResult.setStatus(false);
-            jsonResult.setMessage(e.getClass().getName() + ":" + e.getMessage());
+        List<String> userIdList = new ArrayList<String>();
+        if(userIds != null) {
+            userIdList = Arrays.asList(userIds);
         }
-        return jsonResult;
+        return sysUserRoleService.saveRoleUserList(userIdList, roleId);
     }
 
     @RequestMapping(value = "/queryUserListByRoleId", method = { RequestMethod.POST})
@@ -158,21 +150,6 @@ public class SysRoleController {
     public JsonResult deleteUserRole(
             @ApiParam(name = "userId", required = false) @RequestParam(name = "userId", required = false) String userId,
             @ApiParam(name = "roleId", required = true) @RequestParam(name = "roleId", required = true) String roleId) {
-        JsonResult jsonResult = new JsonResult();
-        try{
-            int result = sysUserRoleService.deleteRoleUser(userId, roleId);
-            if (GlobalConstant.ZERO != result) {
-                jsonResult.setStatus(true);
-                jsonResult.setMessage(GlobalConstant.DELETE_SUCCESSED);
-            } else {
-                jsonResult.setStatus(false);
-                jsonResult.setMessage(GlobalConstant.DELETE_FAIL);
-            }
-        }catch (Exception e) {
-            e.printStackTrace();
-            jsonResult.setStatus(false);
-            jsonResult.setMessage(e.getClass().getName() + ":" + e.getMessage());
-        }
-        return jsonResult;
+        return sysUserRoleService.deleteRoleUser(userId, roleId);
     }
 }
