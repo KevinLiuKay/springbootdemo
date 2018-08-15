@@ -45,8 +45,8 @@
  		<!--<table tableName="pub_file"></table>-->
  		<!--<table tableName="sys_cfg"></table>-->
  		<!--<table tableName="sys_dict"></table>-->
- 		<!--<table tableName="sys_log"></table>-->
-		<table tableName="sys_org"></table>
+ 		<table tableName="sys_log"></table>
+		<!--<table tableName="sys_org"></table>-->
  		<!--<table tableName="sys_user_org"></table>-->
 	</context>
 </generatorConfiguration>

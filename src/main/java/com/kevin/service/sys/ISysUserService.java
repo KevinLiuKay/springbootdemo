@@ -1,13 +1,10 @@
 package com.kevin.service.sys;
 
 import com.kevin.common.utils.JsonResult;
-import com.kevin.model.SysOrg;
-import com.kevin.model.SysRole;
 import com.kevin.model.SysUser;
 import com.kevin.model.ext.sys.SysUserExt;
 import com.kevin.service.ICommonService;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.util.List;
 import java.util.Map;
 /**
@@ -88,6 +85,7 @@ public interface ISysUserService extends ICommonService<SysUser> {
      * @return
      */
     JsonResult saveUserExt(SysUser sysUser, String orgId, List<String> roleIds);
+
     /**
      * 查询用户下角色信息
      * @param list
@@ -100,18 +98,18 @@ public interface ISysUserService extends ICommonService<SysUser> {
      * @CachePut : 使用@CachePut标注的方法在执行前不会去检查缓存中是否存在之前执行过的结果，而是每次都会执行该方法，并将执行结果以键值对的形式存入指定的缓存中。
      * @param sysUser
      */
-    void cachePut(SysUser sysUser);
-
-    /**
-     * @CacheEvict : 清除缓存
-     * @param userId
-     */
-    void cacheEvict(String userId);
+    SysUser cachePut(SysUser sysUser);
 
     /**
      * @Cacheable : Spring在每次执行前都会检查Cache中是否存在相同key的缓存元素，如果存在就不再执行该方法，而是直接从缓存中获取结果进行返回，否则才会执行并将返回结果存入指定的缓存中。
      * @param userId
      */
     SysUser cacheable(String userId);
+
+    /**
+     * @CacheEvict : 清除缓存
+     * @param userId
+     */
+    void cacheEvict(String userId);
 
 }

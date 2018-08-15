@@ -1,8 +1,8 @@
 package com.kevin.service.sys.impl;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.Resource;
 import com.kevin.common.GlobalConstant.GlobalConstant;
 import com.kevin.common.core.GeneralMethod;
 import com.kevin.common.utils.UUIDUtil;
@@ -14,26 +14,30 @@ import com.kevin.model.SysLogExample.Criteria;
 import com.kevin.model.ext.sys.SysLogExt;
 import com.kevin.service.sys.ISysLogService;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-
-
+/**
+ * @author lzk
+ */
 @Service
 @Transactional(rollbackFor=Exception.class)
 public class SysLogServiceImpl implements ISysLogService {
-	@Resource
+	@Autowired
 	private SysLogMapper logMapper;
-	@Resource
+	@Autowired
 	private SysLogExtMapper logExtMapper;
 
 	@Override
 	public int save(SysLog sysLog) {
-		if(StringUtils.isBlank(sysLog.getLogId())){//新增
+		//新增
+		if(StringUtils.isBlank(sysLog.getLogId())){
 			sysLog.setLogId(UUIDUtil.getUUID());
 			GeneralMethod.setRecordInfo(sysLog, true);
 			return logMapper.insertSelective(sysLog);
-		} else {//修改
+		} else {
+		//修改
 			GeneralMethod.setRecordInfo(sysLog, false);
 			return logMapper.updateByPrimaryKeySelective(sysLog);
 		}
@@ -76,7 +80,9 @@ public class SysLogServiceImpl implements ISysLogService {
 	//**********************华丽的分割线 *******************************
 
 	@Override
-	public List<SysLogExt> querySysLogExtList(Map<String, Object> paramMap) {
+	public List<SysLogExt> querySysLogExtList(SysLog sysLog) {
+		Map<String, Object> paramMap = new HashMap<String, Object>();
+		paramMap.put("sysLog", sysLog);
 		return logExtMapper.querySysLogExtList(paramMap);
 	}
 }

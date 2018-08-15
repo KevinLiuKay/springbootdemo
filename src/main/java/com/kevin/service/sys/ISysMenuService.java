@@ -1,5 +1,6 @@
 package com.kevin.service.sys;
 
+import com.kevin.common.utils.JsonResult;
 import com.kevin.model.SysMenu;
 import com.kevin.model.ext.sys.SysMenuExt;
 import com.kevin.service.ICommonService;
@@ -19,4 +20,12 @@ public interface ISysMenuService extends ICommonService<SysMenu> {
      * @return
      */
     List<SysMenuExt> queryMenuTreeByRoleId(String roleId);
+
+    /**
+     * 通过角色分配菜单
+     * @param roleId
+     * @param menuIds
+     * @return
+     */
+    JsonResult saveRoleMenu(String roleId,String [] menuIds);
 }

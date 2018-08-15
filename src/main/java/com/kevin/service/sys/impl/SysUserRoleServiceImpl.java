@@ -9,6 +9,7 @@ import com.kevin.common.utils.UUIDUtil;
 import com.kevin.dao.extMapper.sys.SysRoleExtMapper;
 import com.kevin.dao.mapper.SysUserRoleMapper;
 import com.kevin.exception.CommonException;
+import com.kevin.model.SysRole;
 import com.kevin.model.SysUser;
 import com.kevin.model.SysUserRole;
 import com.kevin.model.SysUserRoleExample;
@@ -19,6 +20,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -243,14 +245,27 @@ public class SysUserRoleServiceImpl implements ISysUserRoleService {
 
     @Override
     public List<SysUserExt> queryUserExtListByRoleId(String roleId, SysUser sysUser) {
-        Map<String, Object> paramMap = new HashMap<String, Object>();
         if(StringUtils.isNotBlank(roleId)) {
+            Map<String, Object> paramMap = new HashMap<String, Object>();
             paramMap.put("roleId", roleId);
             paramMap.put("sysUser", sysUser);
             return sysRoleExtMapper.queryUserExtListByRoleId(paramMap);
         }
         return null;
     }
+
+    @Override
+    @CachePut(value = "currUserCache", key = "'currRoleList_'+ #userId")
+    public List<SysRole> queryRoleListByUserId(String userId) {
+        logger.debug("-----> @CachePut queryRoleListByUserId, key为:currRoleList_" + userId );
+        if(StringUtils.isNotBlank(userId)) {
+            Map<String, Object> paramMap = new HashMap<String, Object>();
+            paramMap.put("userId", userId);
+            return sysRoleExtMapper.queryRoleListByUserId(paramMap);
+        }
+        return null;
+    }
+
     public void throwException(int result,String name){
         if (result == 0) {
             throw new RuntimeException(name);

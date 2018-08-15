@@ -6,6 +6,10 @@ import com.kevin.common.core.GeneralEnum;
 import com.kevin.common.utils.EnumUtil;
 import org.apache.commons.lang3.StringUtils;
 
+/**
+ * @author lzk
+ */
+
 public enum LogTypeEnum implements GeneralEnum<String> {
 	
 	Login("login","登录"),

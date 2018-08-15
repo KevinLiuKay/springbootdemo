@@ -104,4 +104,11 @@ public class SysMenuController {
         }
         return jsonResult;
     }
+
+    @RequestMapping(value = "/saveRoleMenu" , method = RequestMethod.POST)
+    @ApiOperation(value = "角色配置菜单", notes = "角色配置菜单", code = 200, produces = "application/json")
+    public JsonResult saveRoleMenu(@ApiParam(name = "roleId", required = true) @RequestParam(name = "roleId", required = true) String roleId,
+                                   @ApiParam(name = "menuIds", required = false) @RequestParam(name = "menuIds", required = false) String[] menuIds) {
+        return sysMenuService.saveRoleMenu(roleId,menuIds);
+    }
 }

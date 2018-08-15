@@ -11,6 +11,9 @@ import org.springframework.context.annotation.PropertySource;
 
 import javax.sql.DataSource;
 
+/**
+ * @author lzk
+ */
 @Configuration
 @PropertySource(value = "classpath:config/druid.properties")
 public class DruidConfiguration {
@@ -36,7 +39,7 @@ public class DruidConfiguration {
         servletRegistrationBean.addInitParameter("allow","127.0.0.1");
         //IP黑名单 (存在共同时，deny优先于allow) : 如果满足deny的话提示:Sorry, you are not permitted to view this page.
         //servletRegistrationBean.addInitParameter("deny","192.168.1.73");
-        //监控访问 http://localhost:8080/mes/druid， 使用配置的账号密码。
+        //监控访问 http://localhost:8888/springbootdemo/druid， 使用配置的账号密码。
         servletRegistrationBean.addInitParameter("loginUsername","admin");
         servletRegistrationBean.addInitParameter("loginPassword","123456");
         //是否能够重置数据.

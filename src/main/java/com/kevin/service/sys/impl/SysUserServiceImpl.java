@@ -31,7 +31,6 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import javax.annotation.Resource;
@@ -387,7 +386,6 @@ public class SysUserServiceImpl implements ISysUserService {
         SysUserRole sysUserRole = null;
         if(roleIds != null && !roleIds.isEmpty()) {
             int result = GlobalConstant.ZERO;
-            List<String> userRoleIdList = new ArrayList<String>();
             for (String roleId : roleIds) {
                 // 是否新增 false：不新增 true:新增
                 boolean insert = true;
@@ -414,7 +412,7 @@ public class SysUserServiceImpl implements ISysUserService {
                         result += sysUserRoleService.save(sysUserRole);
                     }
                 } else {
-                    // 存在部分不需要的用户角色，删除后全部新增
+                    // 新增全部
                     sysUserRole = new SysUserRole();
                     sysUserRole.setRoleId(roleId);
                     sysUserRole.setUserId(sysUser.getUserId());
@@ -440,21 +438,22 @@ public class SysUserServiceImpl implements ISysUserService {
 
 
     @Override
-    @CachePut(value = "currUser", key = "#sysUser.userId")
-    public void cachePut(SysUser sysUser) {
-        logger.debug("为id、key为:" + sysUser.getUserId() + "数据做了缓存");
+    @CachePut(value = "currUserCache", key = "#sysUser.userId")
+    public SysUser cachePut(SysUser sysUser) {
+        logger.debug("-----> @CachePut currUser, key:" + sysUser.getUserId());
+        return sysUser;
     }
 
     @Override
-    @CacheEvict(value = "currUser", key = "#userId")
+    @CacheEvict(value = "currUserCache", key = "#userId")
     public void cacheEvict(String userId) {
-        logger.debug("删除了id、key为" + userId + "的数据缓存");
+        logger.debug("-----> @CacheEvict currUser, key:" + userId);
     }
 
     @Override
-    @Cacheable(value = "currUser", key = "#userId")
+    @Cacheable(value = "currUserCache", key = "#userId")
     public SysUser cacheable(String userId) {
-        logger.debug("为id、key为:" + userId + "数据做了缓存");
+        logger.debug("-----> @Cacheable currUser, key:" + userId);
         return getById(userId);
     }
 

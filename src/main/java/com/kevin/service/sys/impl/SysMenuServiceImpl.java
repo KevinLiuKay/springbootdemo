@@ -2,11 +2,16 @@ package com.kevin.service.sys.impl;
 
 import com.kevin.common.GlobalConstant.GlobalConstant;
 import com.kevin.common.core.GeneralMethod;
+import com.kevin.common.core.HttpServletContext;
+import com.kevin.common.utils.JsonResult;
 import com.kevin.common.utils.UUIDUtil;
 import com.kevin.dao.extMapper.sys.SysMenuExtMapper;
+import com.kevin.dao.extMapper.sys.SysRoleExtMapper;
 import com.kevin.dao.mapper.SysMenuMapper;
 import com.kevin.model.SysMenu;
 import com.kevin.model.SysMenuExample;
+import com.kevin.model.SysRoleMenu;
+import com.kevin.model.SysUser;
 import com.kevin.model.ext.sys.SysMenuExt;
 import com.kevin.service.sys.ISysMenuService;
 import com.kevin.service.sys.ISysRoleMenuService;
@@ -32,6 +37,8 @@ public class SysMenuServiceImpl implements ISysMenuService {
     private SysMenuMapper sysMenuMapper;
     @Resource
     private SysMenuExtMapper sysMenuExtMapper;
+    @Resource
+    private SysRoleExtMapper sysRoleExtMapper;
     @Resource
     private ISysRoleMenuService sysRoleMenuService;
 
@@ -157,5 +164,102 @@ public class SysMenuServiceImpl implements ISysMenuService {
             return menuTree;
         }
         return null;
+    }
+
+    @Override
+    public JsonResult saveRoleMenu(String roleId, String[] menuIds) {
+        JsonResult jsonResult = new JsonResult();
+        //通过roleId查询SysRoleMenu角色菜单表中存在的所有记录（recordState为Y和N）
+        SysRoleMenu sysRoleMenu = new SysRoleMenu();
+        sysRoleMenu.setRoleId(roleId);
+        List<SysRoleMenu> roleMenuList = sysRoleMenuService.queryList(sysRoleMenu,"");
+        //存放需要删除的
+        Map<String, SysRoleMenu> deleteMap = new HashMap<String, SysRoleMenu>();
+        //存放recordState状态为Y和N的数据
+        List<SysRoleMenu> yList = new ArrayList<SysRoleMenu>();
+        List<SysRoleMenu> nList = new ArrayList<SysRoleMenu>();
+        if(roleMenuList !=null && !roleMenuList.isEmpty()) {
+            for(SysRoleMenu roleMenu : roleMenuList) {
+                if(GlobalConstant.Y.equals(roleMenu.getRecordState())) {
+                    yList.add(roleMenu);
+                    //默认全部删除
+                    deleteMap.put(roleMenu.getRoleMenuId(),roleMenu);
+                }else {
+                    nList.add(roleMenu);
+                }
+            }
+        }
+        //对menuId []进行过滤
+        if(menuIds != null && menuIds.length > 0) {
+            for(String menuId : menuIds){
+                boolean insert = true;
+                //如果数据库中存在部分需要保存的角色菜单信息，继续使用，不删除
+                if(yList != null && !yList.isEmpty()) {
+                    for(SysRoleMenu yrm : yList) {
+                        if(yrm.getMenuId().equals(menuId)){
+                            insert = false;
+                            if(!deleteMap.isEmpty()) {
+                                deleteMap.remove(yrm.getRoleMenuId());
+                            }
+                            break;
+                        }
+                    }
+                }
+                //除去recordState为Y需要的角色菜单信息，其他的新增保存
+                if(insert) {
+                    SysRoleMenu roleMenu = new SysRoleMenu();
+                    roleMenu.setRoleId(roleId);
+                    roleMenu.setMenuId(menuId);
+                    //如果已经删除的角色菜单存在需要绑定的角色菜单信息，修改状态
+                    if(nList != null && !nList.isEmpty()){
+                        for(SysRoleMenu nrm : nList) {
+                            if(nrm.getMenuId().equals(menuId)) {
+                                insert = false;
+                                roleMenu.setRecordState(GlobalConstant.Y);
+                                //从删除的角色菜单中找到需要绑定信息，修改recordState状态N改为Y
+                                throwException(sysRoleMenuService.save(roleMenu),"保存角色菜单关联表失败!");
+                                break;
+                            }
+                        }
+                        //从删除的角色菜单中没有找到需要绑定信息，新增角色菜单信息
+                        if(insert) {
+                            throwException(sysRoleMenuService.save(roleMenu),"保存角色菜单关联表失败!");
+                        }
+                    }else {
+                        //recordState为N的中不存在需要绑定的角色菜单信息，新增角色菜单信息
+                        throwException(sysRoleMenuService.save(roleMenu),"保存角色菜单关联表失败!");
+                    }
+                }
+            }
+        }
+        SysUser currUser = HttpServletContext.getCurrentUser();
+        Date currentTime = Calendar.getInstance().getTime();
+        if(currUser == null) {
+            throwException(GlobalConstant.ZERO,GlobalConstant.SESSION_OUT_TIME);
+        }
+        //逻辑删除不需要的角色菜单信息
+        if(!deleteMap.isEmpty()) {
+            List<String> delRmList = new ArrayList<String>();
+            for (SysRoleMenu value : deleteMap.values()) {
+                delRmList.add(value.getMenuId());
+            }
+            if(delRmList != null && !delRmList.isEmpty()){
+                Map<String, Object> delMap = new HashMap<String, Object>();
+                delMap.put("currUserId",currUser.getUserId());
+                delMap.put("updateTime",currentTime);
+                delMap.put("roleId", roleId);
+                delMap.put("list", delRmList);
+                throwException(sysRoleExtMapper.deleteRoleMenuList(delMap),"保存角色菜单关联表失败!");
+            }
+        }
+        jsonResult.setStatus(true);
+        jsonResult.setMessage(GlobalConstant.SAVE_SUCCESSED);
+        return jsonResult;
+    }
+
+    public void throwException(int result,String name){
+        if (result == 0) {
+            throw new RuntimeException(name);
+        }
     }
 }

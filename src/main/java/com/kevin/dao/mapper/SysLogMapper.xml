@@ -3,6 +3,8 @@
 <mapper namespace="com.kevin.dao.mapper.SysLogMapper" >
   <resultMap id="BaseResultMap" type="com.kevin.model.SysLog" >
     <id column="log_id" property="logId" jdbcType="VARCHAR" />
+    <result column="local_host" property="localHost" jdbcType="VARCHAR" />
+    <result column="proxy_client_ip" property="proxyClientIp" jdbcType="VARCHAR" />
     <result column="log_type_id" property="logTypeId" jdbcType="VARCHAR" />
     <result column="log_detail" property="logDetail" jdbcType="VARCHAR" />
     <result column="record_state" property="recordState" jdbcType="VARCHAR" />
@@ -70,8 +72,8 @@
     </where>
   </sql>
   <sql id="Base_Column_List" >
-    log_id, log_type_id, log_detail, record_state, create_user_id, create_time, update_user_id, 
-    update_time
+    log_id, local_host, proxy_client_ip, log_type_id, log_detail, record_state, create_user_id, 
+    create_time, update_user_id, update_time
   </sql>
   <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.kevin.model.SysLogExample" >
     select
@@ -104,18 +106,26 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.kevin.model.SysLog" >
-    insert into sys_log (log_id, log_type_id, log_detail, 
-      record_state, create_user_id, create_time, 
-      update_user_id, update_time)
-    values (#{logId,jdbcType=VARCHAR}, #{logTypeId,jdbcType=VARCHAR}, #{logDetail,jdbcType=VARCHAR}, 
-      #{recordState,jdbcType=VARCHAR}, #{createUserId,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, 
-      #{updateUserId,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP})
+    insert into sys_log (log_id, local_host, proxy_client_ip, 
+      log_type_id, log_detail, record_state, 
+      create_user_id, create_time, update_user_id, 
+      update_time)
+    values (#{logId,jdbcType=VARCHAR}, #{localHost,jdbcType=VARCHAR}, #{proxyClientIp,jdbcType=VARCHAR}, 
+      #{logTypeId,jdbcType=VARCHAR}, #{logDetail,jdbcType=VARCHAR}, #{recordState,jdbcType=VARCHAR}, 
+      #{createUserId,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateUserId,jdbcType=VARCHAR}, 
+      #{updateTime,jdbcType=TIMESTAMP})
   </insert>
   <insert id="insertSelective" parameterType="com.kevin.model.SysLog" >
     insert into sys_log
     <trim prefix="(" suffix=")" suffixOverrides="," >
       <if test="logId != null" >
         log_id,
+      </if>
+      <if test="localHost != null" >
+        local_host,
+      </if>
+      <if test="proxyClientIp != null" >
+        proxy_client_ip,
       </if>
       <if test="logTypeId != null" >
         log_type_id,
@@ -142,6 +152,12 @@
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="logId != null" >
         #{logId,jdbcType=VARCHAR},
+      </if>
+      <if test="localHost != null" >
+        #{localHost,jdbcType=VARCHAR},
+      </if>
+      <if test="proxyClientIp != null" >
+        #{proxyClientIp,jdbcType=VARCHAR},
       </if>
       <if test="logTypeId != null" >
         #{logTypeId,jdbcType=VARCHAR},
@@ -178,6 +194,12 @@
       <if test="record.logId != null" >
         log_id = #{record.logId,jdbcType=VARCHAR},
       </if>
+      <if test="record.localHost != null" >
+        local_host = #{record.localHost,jdbcType=VARCHAR},
+      </if>
+      <if test="record.proxyClientIp != null" >
+        proxy_client_ip = #{record.proxyClientIp,jdbcType=VARCHAR},
+      </if>
       <if test="record.logTypeId != null" >
         log_type_id = #{record.logTypeId,jdbcType=VARCHAR},
       </if>
@@ -207,6 +229,8 @@
   <update id="updateByExample" parameterType="map" >
     update sys_log
     set log_id = #{record.logId,jdbcType=VARCHAR},
+      local_host = #{record.localHost,jdbcType=VARCHAR},
+      proxy_client_ip = #{record.proxyClientIp,jdbcType=VARCHAR},
       log_type_id = #{record.logTypeId,jdbcType=VARCHAR},
       log_detail = #{record.logDetail,jdbcType=VARCHAR},
       record_state = #{record.recordState,jdbcType=VARCHAR},
@@ -221,6 +245,12 @@
   <update id="updateByPrimaryKeySelective" parameterType="com.kevin.model.SysLog" >
     update sys_log
     <set >
+      <if test="localHost != null" >
+        local_host = #{localHost,jdbcType=VARCHAR},
+      </if>
+      <if test="proxyClientIp != null" >
+        proxy_client_ip = #{proxyClientIp,jdbcType=VARCHAR},
+      </if>
       <if test="logTypeId != null" >
         log_type_id = #{logTypeId,jdbcType=VARCHAR},
       </if>
@@ -247,7 +277,9 @@
   </update>
   <update id="updateByPrimaryKey" parameterType="com.kevin.model.SysLog" >
     update sys_log
-    set log_type_id = #{logTypeId,jdbcType=VARCHAR},
+    set local_host = #{localHost,jdbcType=VARCHAR},
+      proxy_client_ip = #{proxyClientIp,jdbcType=VARCHAR},
+      log_type_id = #{logTypeId,jdbcType=VARCHAR},
       log_detail = #{logDetail,jdbcType=VARCHAR},
       record_state = #{recordState,jdbcType=VARCHAR},
       create_user_id = #{createUserId,jdbcType=VARCHAR},

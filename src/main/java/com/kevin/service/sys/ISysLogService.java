@@ -7,12 +7,15 @@ import com.kevin.service.ICommonService;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * @author lzk
+ */
 public interface ISysLogService extends ICommonService<SysLog> {
 	/**
-	 * 通用扩展查询
-	 * @param paramMap
+	 * 查询日志详情
+	 * @param sysLog
 	 * @param
 	 * @return
 	 */
-	public List<SysLogExt> querySysLogExtList(Map<String, Object> paramMap);
+	 List<SysLogExt> querySysLogExtList(SysLog sysLog);
 }

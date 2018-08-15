@@ -1,6 +1,8 @@
 package com.kevin.service.sys.impl;
 
 import com.kevin.common.GlobalConstant.GlobalConstant;
+import com.kevin.common.core.GeneralMethod;
+import com.kevin.common.utils.UUIDUtil;
 import com.kevin.dao.mapper.SysCfgMapper;
 import com.kevin.model.SysCfg;
 import com.kevin.model.SysCfgExample;
@@ -26,8 +28,17 @@ public class SysCfgServiceImpl implements ISysCfgService {
 
 
 	@Override
-	public int save(SysCfg record) {
-		return 0;
+	public int save(SysCfg sysCfg) {
+		//新增
+		if(StringUtils.isBlank(sysCfg.getCfgCode())){
+			sysCfg.setCfgCode(UUIDUtil.getUUID());
+			GeneralMethod.setRecordInfo(sysCfg, true);
+			return cfgMapper.insertSelective(sysCfg);
+		} else {
+		//修改
+			GeneralMethod.setRecordInfo(sysCfg, false);
+			return cfgMapper.updateByPrimaryKeySelective(sysCfg);
+		}
 	}
 
 	@Override
@@ -58,5 +69,14 @@ public class SysCfgServiceImpl implements ISysCfgService {
 			return cfgMapper.selectByPrimaryKey(id);
 		}
 		return null;
+	}
+
+	@Override
+	public int saveSysCfg(List<SysCfg> sysCfgList) {
+		int result = GlobalConstant.ZERO;
+		for (SysCfg cfg : sysCfgList) {
+			result += save(cfg);
+		}
+		return result;
 	}
 }

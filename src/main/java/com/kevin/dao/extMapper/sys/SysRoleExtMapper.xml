@@ -35,22 +35,6 @@
 		</if>
 	</select>
 
-	<!-- 修改sys_user_role关联表状态为Y -->
-	<update id="updateRecordStateN2Y" parameterType="java.util.Map">
-		<if test="userRoleIdList != null and userRoleIdList.size > 0">
-			update
-			SYS_USER_ROLE
-			set
-			RECORD_STATE = 'Y',
-			UPDATE_USER_ID = #{currUserId},
-			UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP}
-			where user_role_id in
-			<foreach collection="userRoleIdList" open="(" separator="," close=")" item="item">
-				#{item}
-			</foreach>
-		</if>
-	</update>
-
 	<!-- 删除用户角色关联 -->
 	<update id="deleteRoleUser" parameterType="com.kevin.model.SysUserRole">
 	    update
@@ -92,5 +76,31 @@
 				and u.user_phone like #{userPhone}
 			</if>
 		</if>
+	</select>
+
+	<!-- 删除角色菜单关联信息 -->
+	<update id="deleteRoleMenuList" parameterType="java.util.Map">
+		update sys_role_menu
+		set record_state = 'N',
+		update_user_id = #{currUserId},
+		update_time = #{updateTime,jdbcType=TIMESTAMP}
+		where ROLE_ID = #{roleId}
+		and menu_id IN
+		<foreach collection="list" open="(" separator="," close=")" item="item">
+			#{item}
+		</foreach>
+	</update>
+
+	<!-- 通过用户id查询当前用户下的角色信息 -->
+	<select id="queryRoleListByUserId" parameterType="java.util.Map" resultMap="com.kevin.dao.mapper.SysRoleMapper.BaseResultMap">
+		SELECT
+			r.role_id,r.role_name
+		FROM
+			sys_role r
+		INNER JOIN sys_user_role ur ON ur.role_id = r.role_id
+		WHERE
+			ur.record_state = 'Y'
+		AND r.record_state = 'Y'
+		AND ur.user_id = #{userId}
 	</select>
 </mapper>

@@ -175,6 +175,146 @@ public class SysLogExample {
             return (Criteria) this;
         }
 
+        public Criteria andLocalHostIsNull() {
+            addCriterion("local_host is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andLocalHostIsNotNull() {
+            addCriterion("local_host is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andLocalHostEqualTo(String value) {
+            addCriterion("local_host =", value, "localHost");
+            return (Criteria) this;
+        }
+
+        public Criteria andLocalHostNotEqualTo(String value) {
+            addCriterion("local_host <>", value, "localHost");
+            return (Criteria) this;
+        }
+
+        public Criteria andLocalHostGreaterThan(String value) {
+            addCriterion("local_host >", value, "localHost");
+            return (Criteria) this;
+        }
+
+        public Criteria andLocalHostGreaterThanOrEqualTo(String value) {
+            addCriterion("local_host >=", value, "localHost");
+            return (Criteria) this;
+        }
+
+        public Criteria andLocalHostLessThan(String value) {
+            addCriterion("local_host <", value, "localHost");
+            return (Criteria) this;
+        }
+
+        public Criteria andLocalHostLessThanOrEqualTo(String value) {
+            addCriterion("local_host <=", value, "localHost");
+            return (Criteria) this;
+        }
+
+        public Criteria andLocalHostLike(String value) {
+            addCriterion("local_host like", value, "localHost");
+            return (Criteria) this;
+        }
+
+        public Criteria andLocalHostNotLike(String value) {
+            addCriterion("local_host not like", value, "localHost");
+            return (Criteria) this;
+        }
+
+        public Criteria andLocalHostIn(List<String> values) {
+            addCriterion("local_host in", values, "localHost");
+            return (Criteria) this;
+        }
+
+        public Criteria andLocalHostNotIn(List<String> values) {
+            addCriterion("local_host not in", values, "localHost");
+            return (Criteria) this;
+        }
+
+        public Criteria andLocalHostBetween(String value1, String value2) {
+            addCriterion("local_host between", value1, value2, "localHost");
+            return (Criteria) this;
+        }
+
+        public Criteria andLocalHostNotBetween(String value1, String value2) {
+            addCriterion("local_host not between", value1, value2, "localHost");
+            return (Criteria) this;
+        }
+
+        public Criteria andProxyClientIpIsNull() {
+            addCriterion("proxy_client_ip is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andProxyClientIpIsNotNull() {
+            addCriterion("proxy_client_ip is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andProxyClientIpEqualTo(String value) {
+            addCriterion("proxy_client_ip =", value, "proxyClientIp");
+            return (Criteria) this;
+        }
+
+        public Criteria andProxyClientIpNotEqualTo(String value) {
+            addCriterion("proxy_client_ip <>", value, "proxyClientIp");
+            return (Criteria) this;
+        }
+
+        public Criteria andProxyClientIpGreaterThan(String value) {
+            addCriterion("proxy_client_ip >", value, "proxyClientIp");
+            return (Criteria) this;
+        }
+
+        public Criteria andProxyClientIpGreaterThanOrEqualTo(String value) {
+            addCriterion("proxy_client_ip >=", value, "proxyClientIp");
+            return (Criteria) this;
+        }
+
+        public Criteria andProxyClientIpLessThan(String value) {
+            addCriterion("proxy_client_ip <", value, "proxyClientIp");
+            return (Criteria) this;
+        }
+
+        public Criteria andProxyClientIpLessThanOrEqualTo(String value) {
+            addCriterion("proxy_client_ip <=", value, "proxyClientIp");
+            return (Criteria) this;
+        }
+
+        public Criteria andProxyClientIpLike(String value) {
+            addCriterion("proxy_client_ip like", value, "proxyClientIp");
+            return (Criteria) this;
+        }
+
+        public Criteria andProxyClientIpNotLike(String value) {
+            addCriterion("proxy_client_ip not like", value, "proxyClientIp");
+            return (Criteria) this;
+        }
+
+        public Criteria andProxyClientIpIn(List<String> values) {
+            addCriterion("proxy_client_ip in", values, "proxyClientIp");
+            return (Criteria) this;
+        }
+
+        public Criteria andProxyClientIpNotIn(List<String> values) {
+            addCriterion("proxy_client_ip not in", values, "proxyClientIp");
+            return (Criteria) this;
+        }
+
+        public Criteria andProxyClientIpBetween(String value1, String value2) {
+            addCriterion("proxy_client_ip between", value1, value2, "proxyClientIp");
+            return (Criteria) this;
+        }
+
+        public Criteria andProxyClientIpNotBetween(String value1, String value2) {
+            addCriterion("proxy_client_ip not between", value1, value2, "proxyClientIp");
+            return (Criteria) this;
+        }
+
         public Criteria andLogTypeIdIsNull() {
             addCriterion("log_type_id is null");
             return (Criteria) this;

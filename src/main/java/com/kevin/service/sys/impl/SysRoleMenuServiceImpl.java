@@ -6,8 +6,6 @@ import com.kevin.common.utils.UUIDUtil;
 import com.kevin.dao.mapper.SysRoleMenuMapper;
 import com.kevin.model.SysRoleMenu;
 import com.kevin.model.SysRoleMenuExample;
-import com.kevin.model.SysUserRole;
-import com.kevin.model.SysUserRoleExample;
 import com.kevin.service.sys.ISysRoleMenuService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;

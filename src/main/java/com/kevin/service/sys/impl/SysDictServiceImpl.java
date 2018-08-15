@@ -32,18 +32,16 @@ public class SysDictServiceImpl implements ISysDictService {
 
 	@Override
 	public int save(SysDict sysDict) {
-		if(StringUtils.isBlank(sysDict.getDictId())){//新增
+		//新增
+		if(StringUtils.isBlank(sysDict.getDictId())){
 			sysDict.setDictId(UUIDUtil.getUUID());
 			GeneralMethod.setRecordInfo(sysDict, true);
-			/*if(StringUtils.isNotBlank(sysDict.getDictTypeId())){
-				sysDict.setDictTypeName(DictTypeEnum.getNameById(sysDict.getDictTypeId()));
-			}*/
-
 			//最大值
 			int maxVal = dictExtMapper.maxSortKey(sysDict);
 			sysDict.setSortKey(maxVal+1);
 			return dictMapper.insertSelective(sysDict);
-		} else {//修改
+		} else {
+			//修改
 			GeneralMethod.setRecordInfo(sysDict, false);
 			return dictMapper.updateByPrimaryKeySelective(sysDict);
 		}
@@ -77,11 +75,6 @@ public class SysDictServiceImpl implements ISysDictService {
 		return dictMapper.selectByExample(example);
 	}
 
-	/**
-	 * 公用查询条件
-	 * @param sysDict
-	 * @param criteria
-	 */
 	private void andCriteria(SysDict sysDict, Criteria criteria) {
 		if(StringUtils.isNotBlank(sysDict.getDictTypeId())){
 			criteria.andDictTypeIdEqualTo(sysDict.getDictTypeId());
@@ -115,64 +108,5 @@ public class SysDictServiceImpl implements ISysDictService {
 		}
 		return dictMapper.selectByExample(example);
 	}
-
-	@Override
-	public int saveSort(String[] dictId) {
-		int result = GlobalConstant.ZERO;
-		if(dictId == null) {
-			return result;
-		}
-		int i = GlobalConstant.ONE;
-		for(String id : dictId){
-			SysDict sysDict = new SysDict();
-			sysDict.setDictId(id);
-			sysDict.setSortKey((i++));
-			result += save(sysDict);
-		}
-		return result;
-	}
-
-	@Override
-	public int saveSort(String dictTypeId, String currRecordId, String oldRecordId) {
-		int result = GlobalConstant.ZERO;
-		SysDict oldDict = getById(oldRecordId);
-		SysDict currSysDict = getById(currRecordId);
-		if(oldDict != null && currSysDict != null){
-			int oldSortKey = oldDict.getSortKey();
-			int currSortKey = currSysDict.getSortKey();
-			Map<String, Object> paramMap = new HashMap<String, Object>();
-			String currUserId = HttpServletContext.getCurrentUser().getUserId();
-			//long currTime = System.currentTimeMillis();
-			paramMap.put("oldSortKey", oldSortKey);
-			paramMap.put("currSortKey", currSortKey);
-			paramMap.put("currUserId", currUserId);
-			paramMap.put("dictTypeId", dictTypeId);
-			paramMap.put("updateTime", Calendar.getInstance().getTime());
-			//==判断大小
-			if(currSortKey > oldSortKey){//5-->1 : 1到4  批量+1
-				result += dictExtMapper.setSortKeyAddOne(paramMap);
-			}else if(currSortKey < oldSortKey){//1-->5:  2到5  批量-1
-				result += dictExtMapper.setSortKeySubOne(paramMap);
-			}
-			SysDict updateCurr = new SysDict();
-			updateCurr.setDictId(currRecordId);
-			updateCurr.setSortKey(oldSortKey);
-			result += save(updateCurr);
-		}
-		return result;
-	}
-
-	@Override
-	public int saveSort(String[] dictId, int firstSerialNum) {
-		String currUserId = HttpServletContext.getCurrentUser().getUserId();
-		//long currTime = System.currentTimeMillis();
-		Map<String, Object> paramMap = new HashMap<String, Object>();
-		paramMap.put("currUserId", currUserId);
-		paramMap.put("dictId", dictId);
-		paramMap.put("firstSerialNum", firstSerialNum);
-		return dictExtMapper.saveSort(paramMap);
-	}
-
-
 
 }

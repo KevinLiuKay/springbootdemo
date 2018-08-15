@@ -5,6 +5,10 @@ import java.util.Date;
 public class SysLog {
     private String logId;
 
+    private String localHost;
+
+    private String proxyClientIp;
+
     private String logTypeId;
 
     private String logDetail;
@@ -25,6 +29,22 @@ public class SysLog {
 
     public void setLogId(String logId) {
         this.logId = logId;
+    }
+
+    public String getLocalHost() {
+        return localHost;
+    }
+
+    public void setLocalHost(String localHost) {
+        this.localHost = localHost;
+    }
+
+    public String getProxyClientIp() {
+        return proxyClientIp;
+    }
+
+    public void setProxyClientIp(String proxyClientIp) {
+        this.proxyClientIp = proxyClientIp;
     }
 
     public String getLogTypeId() {
