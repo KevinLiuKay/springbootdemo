@@ -4,7 +4,6 @@ import java.util.*;
 import javax.annotation.Resource;
 import com.kevin.common.GlobalConstant.GlobalConstant;
 import com.kevin.common.core.GeneralMethod;
-import com.kevin.common.core.HttpServletContext;
 import com.kevin.common.utils.UUIDUtil;
 import com.kevin.dao.extMapper.sys.SysDictExtMapper;
 import com.kevin.dao.mapper.SysDictMapper;
@@ -62,7 +61,7 @@ public class SysDictServiceImpl implements ISysDictService {
 	@Override
 	public List<SysDict> queryList(SysDict sysDict, String orderByClause) {
 		SysDictExample example = new SysDictExample();
-		Criteria criteria = example.createCriteria();
+		SysDictExample.Criteria criteria = example.createCriteria();
 		andCriteria(sysDict, criteria);
 
 		if(StringUtils.isNotBlank(sysDict.getDictValue())){

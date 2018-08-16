@@ -2,16 +2,10 @@ package com.kevin.service.sys.impl;
 import com.kevin.common.GlobalConstant.GlobalConstant;
 import com.kevin.common.core.GeneralMethod;
 
-import com.kevin.common.core.HttpServletContext;
 import com.kevin.common.utils.UUIDUtil;
-import com.kevin.dao.extMapper.sys.SysRoleExtMapper;
 import com.kevin.dao.mapper.SysRoleMapper;
-import com.kevin.dao.mapper.SysUserRoleMapper;
 import com.kevin.model.SysRole;
 import com.kevin.model.SysRoleExample;
-import com.kevin.model.SysUserRole;
-import com.kevin.model.SysUserRoleExample;
-import com.kevin.model.SysUserRoleExample.Criteria;
 import com.kevin.service.sys.ISysRoleService;
 import com.kevin.service.sys.ISysUserRoleService;
 import org.apache.commons.lang3.StringUtils;
@@ -21,10 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author lzk

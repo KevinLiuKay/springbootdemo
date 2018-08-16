@@ -15,12 +15,9 @@ import com.kevin.common.core.GeneralEnum;
 public class EnumUtil {
 
     /**
-     * 将GeneralEnum.getId()作为Key,GeneralEnum.getName()作为value,存放在Map中并返回
+     * 将GeneralEnum.getId()作为Key,GeneralEnum.getName()作为value,存放在List中并返回
      * @param <T>
      * @param values
-     * @return 
-     * @return 
-     * @return 
      * @return
      */
     public static List<? extends GeneralEnum> toList(Class<? extends GeneralEnum> enumClass) {
@@ -52,12 +49,16 @@ public class EnumUtil {
     }
     
     public static <T extends GeneralEnum<K>,K> K getId(T enumValue) {
-        if(enumValue == null) return null;
+        if(enumValue == null) {
+            return null;
+        }
         return enumValue.getId();
     }
     
     public static <T extends GeneralEnum> String getName(T enumValue) {
-        if(enumValue == null) return null;
+        if(enumValue == null) {
+            return null;
+        }
         return enumValue.getName();
     }
    
@@ -117,7 +118,6 @@ public class EnumUtil {
     * @param <T>
     * @param id
     * @param values
-    * @return
     * @throws IllegalArgumentException 根据id得到Enum,找不到则抛异常
     */
    public static <T extends GeneralEnum> T getRequiredById(Object id,T[] values) throws IllegalArgumentException {

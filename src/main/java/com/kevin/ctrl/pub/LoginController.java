@@ -8,11 +8,11 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import com.kevin.common.shiro.PasswordHelper;
+import com.kevin.enums.sys.LogTypeEnum;
 import com.kevin.model.SysLog;
 import com.kevin.model.SysRole;
 import com.kevin.model.SysUser;
 import com.kevin.service.sys.ISysLogService;
-import com.kevin.service.sys.ISysRoleService;
 import com.kevin.service.sys.ISysUserRoleService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -88,6 +88,8 @@ public class LoginController extends CommonController {
          * 记录日志
          */
         SysLog sysLog = new SysLog();
+        sysLog.setLogTypeId(LogTypeEnum.Login.getId());
+        sysLog.setLogDetail(LogTypeEnum.Login.getName());
         try {
             String ipAddr = getIpAddr(request);
             sysLog.setProxyClientIp(ipAddr);
@@ -142,10 +144,27 @@ public class LoginController extends CommonController {
     @RequestMapping(value = "/exit",method = {RequestMethod.POST})
     @ApiOperation(value = "退出登录", notes = "退出登录", code = 200, produces = "application/json")
     public JsonResult exit(HttpServletRequest request, HttpServletResponse response) {
-    		JsonResult jsonResult = new JsonResult();
-    		jsonResult.setStatus(true);
-    		//注销用户，使session失效。
+        JsonResult jsonResult = new JsonResult();
+        jsonResult.setStatus(false);
+        /**
+         * 记录日志
+         */
+        SysLog sysLog = new SysLog();
+        sysLog.setLogTypeId(LogTypeEnum.Logout.getId());
+        sysLog.setLogDetail(LogTypeEnum.Logout.getName());
+        try {
+            String ipAddr = getIpAddr(request);
+            sysLog.setProxyClientIp(ipAddr);
+            sysLog.setLocalHost(InetAddress.getLocalHost().toString());
+            // 获得客户端的主机名
+        } catch (UnknownHostException e) {
+            logger.debug("----->  catch UnknownHostException:" + e.getMessage());
+        }
+        logService.save(sysLog);
+        //注销用户，使session失效。
         request.getSession().invalidate();
+        jsonResult.setStatus(true);
+        jsonResult.setMessage(GlobalConstant.OPERATE_SUCCESSED);
         return jsonResult;
      }
 

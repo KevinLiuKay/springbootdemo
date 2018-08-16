@@ -2,9 +2,7 @@ package com.kevin.common.core;
 
 /**
  * 用于枚举需要实现的接口
- * @author Tiger Mo
- *
- * @create 2016.04.13
+ * @author lzk
  */
 public interface GeneralEnum<K> {
 

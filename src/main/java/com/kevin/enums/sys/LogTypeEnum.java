@@ -13,8 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 public enum LogTypeEnum implements GeneralEnum<String> {
 	
 	Login("login","登录"),
-	Logout("logout","退出"),
-	;
+	Logout("logout","退出");
 
 	private final String id;
 	private final String name;

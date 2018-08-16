@@ -1,7 +1,6 @@
 package com.kevin.service.sys;
 
 import com.kevin.model.SysOrg;
-import com.kevin.model.ext.sys.SysMenuExt;
 import com.kevin.model.ext.sys.SysOrgExt;
 import com.kevin.service.ICommonService;
 

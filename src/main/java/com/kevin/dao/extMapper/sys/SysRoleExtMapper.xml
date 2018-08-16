@@ -7,6 +7,8 @@
 			<result property="roleName" column="role_name" jdbcType="VARCHAR"  />
 		</collection>
 	</resultMap>
+	<resultMap id="roleMap" type="com.kevin.model.SysRole">
+	</resultMap>
 	<!-- 通过roleId，userIdList查找关联表信息 -->
 	<select id="queryRoleUserList" parameterType="java.util.Map" resultMap="com.kevin.dao.mapper.SysUserRoleMapper.BaseResultMap">
 		select
@@ -92,7 +94,7 @@
 	</update>
 
 	<!-- 通过用户id查询当前用户下的角色信息 -->
-	<select id="queryRoleListByUserId" parameterType="java.util.Map" resultMap="com.kevin.dao.mapper.SysRoleMapper.BaseResultMap">
+	<select id="queryRoleListByUserId" parameterType="java.util.Map" resultMap="roleMap">
 		SELECT
 			r.role_id,r.role_name
 		FROM

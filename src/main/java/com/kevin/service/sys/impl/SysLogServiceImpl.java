@@ -10,7 +10,6 @@ import com.kevin.dao.extMapper.sys.SysLogExtMapper;
 import com.kevin.dao.mapper.SysLogMapper;
 import com.kevin.model.SysLog;
 import com.kevin.model.SysLogExample;
-import com.kevin.model.SysLogExample.Criteria;
 import com.kevin.model.ext.sys.SysLogExt;
 import com.kevin.service.sys.ISysLogService;
 import org.apache.commons.lang3.StringUtils;
@@ -58,7 +57,7 @@ public class SysLogServiceImpl implements ISysLogService {
 	@Override
 	public List<SysLog> queryList(SysLog sysLog, String orderByClause) {
 		SysLogExample example = new SysLogExample();
-		Criteria criteria = example.createCriteria().andRecordStateEqualTo(GlobalConstant.Y);
+		SysLogExample.Criteria criteria = example.createCriteria().andRecordStateEqualTo(GlobalConstant.Y);
 		if(sysLog.getLogTypeId() != null){
 			criteria.andLogTypeIdEqualTo(sysLog.getLogTypeId());
 		}

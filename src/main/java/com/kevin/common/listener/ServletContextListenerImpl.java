@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javax.annotation.Resource;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -18,10 +17,10 @@ import com.kevin.model.SysCfg;
 import com.kevin.model.SysDict;
 import com.kevin.service.sys.ISysCfgService;
 import com.kevin.service.sys.ISysDictService;
-import com.kevin.service.sys.ISysMenuService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * 监听ServletContext对象的生命周期，实际上就是监听Web应用的生命周期。
@@ -39,11 +38,11 @@ public class ServletContextListenerImpl implements ServletContextListener {
 	private static ISysDictService dictService;
 	private static ISysCfgService cfgService;
 	
-	@Resource
+	@Autowired
     public void setService(ISysDictService dictService) {
 		ServletContextListenerImpl.dictService = dictService;
     }
-	@Resource
+	@Autowired
 	public void setService(ISysCfgService cfgService) {
 		ServletContextListenerImpl.cfgService = cfgService;
 	}
@@ -54,7 +53,6 @@ public class ServletContextListenerImpl implements ServletContextListener {
 	 */
 	@Override
 	public void contextDestroyed(ServletContextEvent event) {
-		
 	}
 
 	/**
@@ -73,7 +71,7 @@ public class ServletContextListenerImpl implements ServletContextListener {
 			//加载系统代码
 			_loadEnum(context);
 		} catch (Exception e) {
-			logger.debug("----> e.getMessage():" + e.getMessage());
+			logger.debug("----> 系统初始化异常:" + e.getMessage());
 		}
 	}
 	
@@ -93,7 +91,7 @@ public class ServletContextListenerImpl implements ServletContextListener {
 			_loadEnum(context);
 			return GlobalConstant.OPERATE_SUCCESSED;
 		} catch (Exception e) {
-			logger.debug("----> e.getMessage():" + e.getMessage());
+			logger.debug("----> 刷新服务器异常:" + e.getMessage());
 			return GlobalConstant.OPERATE_FAIL;
 		}
 	}
@@ -107,6 +105,7 @@ public class ServletContextListenerImpl implements ServletContextListener {
 		Map<String, List<SysDict>> sysListDictMap = new HashMap<String, List<SysDict>>();
 		Map<String, String> sysDictIdMap = new HashMap<String, String>();
 		Map<String, Map<String, String>> sysDictNameMap = new HashMap<String, Map<String, String>>();
+		//从字典枚举类从读取枚举数据
 		List<DictTypeEnum> dictTypeEnumList = (List<DictTypeEnum>) EnumUtil.toList(DictTypeEnum.class);
 		for(DictTypeEnum dictTypeEnum : dictTypeEnumList){		
 			String dictTypeId = dictTypeEnum.getId();
@@ -158,7 +157,7 @@ public class ServletContextListenerImpl implements ServletContextListener {
 			context.setAttribute("dictTypeEnum"+dictTypeEnum.name()+"List", sysDictList);
 		}
 //		GlobalContext.sysDictListMap = sysListDictMap;
-		ServletContextListenerImpl.sysDictNameMap = sysDictNameMap;
+//		ServletContextListenerImpl.sysDictNameMap = sysDictNameMap;
 		DictTypeEnum.sysDictIdMap = sysDictIdMap;
 		DictTypeEnum.sysListDictMap = sysListDictMap;
 	}

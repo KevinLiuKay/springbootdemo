@@ -6,7 +6,6 @@ import com.kevin.common.utils.UUIDUtil;
 import com.kevin.dao.mapper.SysUserOrgMapper;
 import com.kevin.model.SysUserOrg;
 import com.kevin.model.SysUserOrgExample;
-import com.kevin.model.SysUserOrgExample.Criteria;
 import com.kevin.service.sys.ISysUserOrgService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -66,7 +65,7 @@ public class SysUserOrgServiceImpl implements ISysUserOrgService {
     @Override
     public List<SysUserOrg> queryList(SysUserOrg sysUserOrg, String orderByClause) {
         SysUserOrgExample example = new SysUserOrgExample();
-        Criteria criteria = example.createCriteria();
+        SysUserOrgExample.Criteria criteria = example.createCriteria();
 
         andCrieria(sysUserOrg, criteria);
         /* 排序字段 */

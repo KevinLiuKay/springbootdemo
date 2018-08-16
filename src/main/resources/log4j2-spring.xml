@@ -1,29 +1,82 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<Configuration status="OFF">
-    <Appenders>
-        <Console name="Console" target="SYSTEM_OUT">
-            <!--控制台只输出level及以上级别的信息（onMatch），其他的直接拒绝（onMismatch）-->
-            <ThresholdFilter level="DEBUG" onMatch="ACCEPT" onMismatch="DENY"/>
-            <PatternLayout pattern="%d{yyyy.MM.dd 'at' HH:mm:ss z} %-5level %class{36} %M() @%L - %msg%n"/>
-        </Console>
-        <File name="ERROR" fileName="D:/log/error.log" append="false">
-            <ThresholdFilter level="error" onMatch="ACCEPT" onMismatch="DENY"/>
-            <PatternLayout pattern="%d{yyyy.MM.dd 'at' HH:mm:ss z} %-5level %class{36} %M() @%L - %msg%n"/>
-        </File>
-        <!--这个会打印出所有的信息，每次大小超过size，则这size大小的日志会自动存入按年份-月份建立的文件夹下面并进行压缩，作为存档-->
-        <RollingFile name="RollingFile" fileName="D:/log/springbootdemo.log"
-                     filePattern="D:/log/$${date:yyyy-MM-dd}/springbootdemo-%d{yyyy-MM-dd}-%i.log">
-            <PatternLayout pattern="%d{yyyy.MM.dd 'at' HH:mm:ss z} %-5level %class{36} %M() @%L - %msg%n"/>
-            <SizeBasedTriggeringPolicy size="100MB"/>
-            <!-- 指定每天的最大压缩包个数，默认7个，超过了会覆盖之前的 -->
-            <DefaultRolloverStrategy max="50"/>
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- 该xml配置中,xml元素大小写不敏感 -->
+<!-- status="off",log4j2把自身事件记录到控制台的配置，off表示不记录，其余的记录有trace，debug，info，warn，error，fatal -->
+<!--设置log4j2的自身log级别为warn-->
+<!--日志级别以及优先级排序: OFF > FATAL > ERROR > WARN > INFO > DEBUG > TRACE > ALL -->
+<!--Configuration后面的status，这个用于设置log4j2自身内部的信息输出，可以不设置，
+    当设置成trace时，你会看到log4j2内部各种详细输出-->
+<!-- monitorInterval表示检测更改配置的时间,单位是秒,最小间隔为5秒,0或负数表示不检测 -->
+<configuration name="test-cfg" status="off" monitorInterval="0">
+
+    <!-- 常量引用 -->
+    <properties>
+        <property name="LOG_HOME">D:/log</property>
+        <property name="PROJ_NAME">SpringBootDemo</property>
+        <property name="FORMAT">%p %d{yy/MM/dd HH:mm:ss,SSS} | %l | %m%n</property>
+    </properties>
+
+    <!-- appender用于接收各种日志 -->
+    <appenders>
+        <!-- 配置日志输出文件名字  实现日志按日期进行分割   追加读写 -->
+        <RollingFile name="rollingFile" fileName="${LOG_HOME}/app.log" filePattern="${LOG_HOME}/app_%d{yyyy-MM-dd}.log" append="true">
+            <PatternLayout pattern="${FORMAT}"/>
+            <!-- 设置策略 -->
+            <Policies>
+                <!-- 基于时间的触发策略。该策略主要是完成周期性的log文件封存工作。有两个参数：
+                    interval，integer型，指定两次封存动作之间的时间间隔。单位:以日志的命名精度来确定单位，
+                        比如yyyy-MM-dd-HH 单位为小时，yyyy-MM-dd-HH-mm 单位为分钟
+                    modulate，boolean型，说明是否对封存时间进行调制。若modulate=true，
+                        则封存时间将以0点为边界进行偏移计算。比如，modulate=true，interval=4hours，
+                        那么假设上次封存日志的时间为03:00，则下次封存日志的时间为04:00，
+                        之后的封存时间依次为08:00，12:00，16:00
+                 -->
+                <TimeBasedTriggeringPolicy interval="1" modulate="true" />
+            </Policies>
         </RollingFile>
-    </Appenders>
-    <Loggers>
-        <Root level="INFO">
-            <appender-ref ref="ERROR" />
-            <appender-ref ref="RollingFile"/>
-            <appender-ref ref="Console"/>
-        </Root>
-    </Loggers>
-</Configuration>
+
+        <!-- 常见的输出到console,常用于开发环境中,默认是system_err,还有一个system_out -->
+        <console name="console" target="system_out">
+            <!-- appender级别的日志过滤 -->
+            <thresholdFilter level="debug" onMatch="accept" onMismatch="deny"/>
+            <patternLayout pattern="${FORMAT}" />
+        </console>
+
+        <!-- 常用于开发环境,把日志记录到文件中,默认追加 -->
+        <!--<file name="file" fileName="${LOG_HOME}/file.log"  append="false">-->
+            <!--<patternLayout pattern="${FORMAT}" />-->
+        <!--</file>-->
+
+    </appenders>
+
+    <!-- 接收appender -->
+    <loggers>
+        <logger name="org.apache.http" level="WARN" />
+        <!-- Spring -->
+        <logger name="org.springframework" level="INFO" />
+        <!-- mybatis loggers -->
+        <logger name="com.ibatis" level="DEBUG" />
+        <logger name="com.ibatis.common.jdbc.SimpleDataSource" level="DEBUG" />
+        <logger name="com.ibatis.common.jdbc.ScriptRunner" level="DEBUG" />
+        <logger name="com.ibatis.sqlmap.engine.impl.SqlMapClientDelegate" level="DEBUG" />
+        <!-- sql loggers -->
+        <logger name="java.sql.Connection" level="DEBUG"  additivity="true"/>
+        <logger name="java.sql.Statement" level="DEBUG" additivity="true" />
+        <logger name="java.sql.PreparedStatement" level="DEBUG"  additivity="true"/>
+        <logger name="java.sql.ResultSet" level="DEBUG"  additivity="true"/>
+        <!-- 对包进行更详细的配置 -->
+        <!-- additivity表示是否追加,防止重复,因为root已经接收过一次了 -->
+        <logger name="cn.com.baseos" level="DEBUG" additivity="false">
+            <appender-ref ref="console" />
+            <appender-ref ref="file" />
+        </logger>
+        <logger name="com.kevin" level="DEBUG"  additivity="true"/>
+
+        <!-- 配置记录器级别  root logger,一般用于放置所有的appender -->
+        <root level="info">
+            <appender-ref ref="console" />
+            <!--<appender-ref ref="file" />-->
+            <appender-ref ref="rollingFile" />
+        </root>
+    </loggers>
+
+</configuration>

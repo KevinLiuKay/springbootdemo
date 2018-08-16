@@ -1,7 +1,5 @@
 package com.kevin.ctrl.sys;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.kevin.common.GlobalConstant.GlobalConstant;

@@ -8,11 +8,11 @@
     <result column="menu_sort" property="menuSort" jdbcType="INTEGER" />
     <result column="menu_icon" property="menuIcon" jdbcType="VARCHAR" />
     <result column="url" property="url" jdbcType="VARCHAR" />
+    <result column="record_state" property="recordState" jdbcType="VARCHAR" />
     <result column="create_user_id" property="createUserId" jdbcType="VARCHAR" />
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
     <result column="update_user_id" property="updateUserId" jdbcType="VARCHAR" />
     <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
-    <result column="record_state" property="recordState" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Example_Where_Clause" >
     <where >
@@ -73,8 +73,8 @@
     </where>
   </sql>
   <sql id="Base_Column_List" >
-    menu_id, menu_name, menu_parent_id, menu_sort, menu_icon, url, create_user_id, create_time, 
-    update_user_id, update_time, record_state
+    menu_id, menu_name, menu_parent_id, menu_sort, menu_icon, url, record_state, create_user_id, 
+    create_time, update_user_id, update_time
   </sql>
   <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.kevin.model.SysMenuExample" >
     select
@@ -109,12 +109,12 @@
   <insert id="insert" parameterType="com.kevin.model.SysMenu" >
     insert into sys_menu (menu_id, menu_name, menu_parent_id, 
       menu_sort, menu_icon, url, 
-      create_user_id, create_time, update_user_id, 
-      update_time, record_state)
+      record_state, create_user_id, create_time, 
+      update_user_id, update_time)
     values (#{menuId,jdbcType=VARCHAR}, #{menuName,jdbcType=VARCHAR}, #{menuParentId,jdbcType=VARCHAR}, 
       #{menuSort,jdbcType=INTEGER}, #{menuIcon,jdbcType=VARCHAR}, #{url,jdbcType=VARCHAR}, 
-      #{createUserId,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateUserId,jdbcType=VARCHAR}, 
-      #{updateTime,jdbcType=TIMESTAMP}, #{recordState,jdbcType=VARCHAR})
+      #{recordState,jdbcType=VARCHAR}, #{createUserId,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{updateUserId,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP})
   </insert>
   <insert id="insertSelective" parameterType="com.kevin.model.SysMenu" >
     insert into sys_menu
@@ -137,6 +137,9 @@
       <if test="url != null" >
         url,
       </if>
+      <if test="recordState != null" >
+        record_state,
+      </if>
       <if test="createUserId != null" >
         create_user_id,
       </if>
@@ -148,9 +151,6 @@
       </if>
       <if test="updateTime != null" >
         update_time,
-      </if>
-      <if test="recordState != null" >
-        record_state,
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
@@ -172,6 +172,9 @@
       <if test="url != null" >
         #{url,jdbcType=VARCHAR},
       </if>
+      <if test="recordState != null" >
+        #{recordState,jdbcType=VARCHAR},
+      </if>
       <if test="createUserId != null" >
         #{createUserId,jdbcType=VARCHAR},
       </if>
@@ -183,9 +186,6 @@
       </if>
       <if test="updateTime != null" >
         #{updateTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="recordState != null" >
-        #{recordState,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -216,6 +216,9 @@
       <if test="record.url != null" >
         url = #{record.url,jdbcType=VARCHAR},
       </if>
+      <if test="record.recordState != null" >
+        record_state = #{record.recordState,jdbcType=VARCHAR},
+      </if>
       <if test="record.createUserId != null" >
         create_user_id = #{record.createUserId,jdbcType=VARCHAR},
       </if>
@@ -227,9 +230,6 @@
       </if>
       <if test="record.updateTime != null" >
         update_time = #{record.updateTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="record.recordState != null" >
-        record_state = #{record.recordState,jdbcType=VARCHAR},
       </if>
     </set>
     <if test="_parameter != null" >
@@ -244,11 +244,11 @@
       menu_sort = #{record.menuSort,jdbcType=INTEGER},
       menu_icon = #{record.menuIcon,jdbcType=VARCHAR},
       url = #{record.url,jdbcType=VARCHAR},
+      record_state = #{record.recordState,jdbcType=VARCHAR},
       create_user_id = #{record.createUserId,jdbcType=VARCHAR},
       create_time = #{record.createTime,jdbcType=TIMESTAMP},
       update_user_id = #{record.updateUserId,jdbcType=VARCHAR},
-      update_time = #{record.updateTime,jdbcType=TIMESTAMP},
-      record_state = #{record.recordState,jdbcType=VARCHAR}
+      update_time = #{record.updateTime,jdbcType=TIMESTAMP}
     <if test="_parameter != null" >
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -271,6 +271,9 @@
       <if test="url != null" >
         url = #{url,jdbcType=VARCHAR},
       </if>
+      <if test="recordState != null" >
+        record_state = #{recordState,jdbcType=VARCHAR},
+      </if>
       <if test="createUserId != null" >
         create_user_id = #{createUserId,jdbcType=VARCHAR},
       </if>
@@ -283,9 +286,6 @@
       <if test="updateTime != null" >
         update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="recordState != null" >
-        record_state = #{recordState,jdbcType=VARCHAR},
-      </if>
     </set>
     where menu_id = #{menuId,jdbcType=VARCHAR}
   </update>
@@ -296,11 +296,11 @@
       menu_sort = #{menuSort,jdbcType=INTEGER},
       menu_icon = #{menuIcon,jdbcType=VARCHAR},
       url = #{url,jdbcType=VARCHAR},
+      record_state = #{recordState,jdbcType=VARCHAR},
       create_user_id = #{createUserId,jdbcType=VARCHAR},
       create_time = #{createTime,jdbcType=TIMESTAMP},
       update_user_id = #{updateUserId,jdbcType=VARCHAR},
-      update_time = #{updateTime,jdbcType=TIMESTAMP},
-      record_state = #{recordState,jdbcType=VARCHAR}
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
     where menu_id = #{menuId,jdbcType=VARCHAR}
   </update>
 </mapper>

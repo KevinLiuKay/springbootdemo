@@ -8,18 +8,15 @@ import com.kevin.common.utils.JsonResult;
 import com.kevin.common.utils.UUIDUtil;
 import com.kevin.dao.extMapper.sys.SysRoleExtMapper;
 import com.kevin.dao.mapper.SysUserRoleMapper;
-import com.kevin.exception.CommonException;
 import com.kevin.model.SysRole;
 import com.kevin.model.SysUser;
 import com.kevin.model.SysUserRole;
 import com.kevin.model.SysUserRoleExample;
-import com.kevin.model.SysUserRoleExample.Criteria;
 import com.kevin.model.ext.sys.SysUserExt;
 import com.kevin.service.sys.ISysUserRoleService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -106,7 +103,7 @@ public class SysUserRoleServiceImpl implements ISysUserRoleService {
     @Override
     public long count(SysUserRole sysUserRole) {
         SysUserRoleExample example = new SysUserRoleExample();
-        Criteria criteria = example.createCriteria();
+        SysUserRoleExample.Criteria criteria = example.createCriteria();
         if(StringUtils.isNotBlank(sysUserRole.getRecordState())) {
             criteria.andRecordStateEqualTo(sysUserRole.getRecordState());
         }

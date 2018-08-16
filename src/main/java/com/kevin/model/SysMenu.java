@@ -15,6 +15,8 @@ public class SysMenu {
 
     private String url;
 
+    private String recordState;
+
     private String createUserId;
 
     private Date createTime;
@@ -22,8 +24,6 @@ public class SysMenu {
     private String updateUserId;
 
     private Date updateTime;
-
-    private String recordState;
 
     public String getMenuId() {
         return menuId;
@@ -73,6 +73,14 @@ public class SysMenu {
         this.url = url;
     }
 
+    public String getRecordState() {
+        return recordState;
+    }
+
+    public void setRecordState(String recordState) {
+        this.recordState = recordState;
+    }
+
     public String getCreateUserId() {
         return createUserId;
     }
@@ -103,13 +111,5 @@ public class SysMenu {
 
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
-    }
-
-    public String getRecordState() {
-        return recordState;
-    }
-
-    public void setRecordState(String recordState) {
-        this.recordState = recordState;
     }
 }

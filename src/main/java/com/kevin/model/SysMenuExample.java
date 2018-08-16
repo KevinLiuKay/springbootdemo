@@ -515,6 +515,76 @@ public class SysMenuExample {
             return (Criteria) this;
         }
 
+        public Criteria andRecordStateIsNull() {
+            addCriterion("record_state is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andRecordStateIsNotNull() {
+            addCriterion("record_state is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andRecordStateEqualTo(String value) {
+            addCriterion("record_state =", value, "recordState");
+            return (Criteria) this;
+        }
+
+        public Criteria andRecordStateNotEqualTo(String value) {
+            addCriterion("record_state <>", value, "recordState");
+            return (Criteria) this;
+        }
+
+        public Criteria andRecordStateGreaterThan(String value) {
+            addCriterion("record_state >", value, "recordState");
+            return (Criteria) this;
+        }
+
+        public Criteria andRecordStateGreaterThanOrEqualTo(String value) {
+            addCriterion("record_state >=", value, "recordState");
+            return (Criteria) this;
+        }
+
+        public Criteria andRecordStateLessThan(String value) {
+            addCriterion("record_state <", value, "recordState");
+            return (Criteria) this;
+        }
+
+        public Criteria andRecordStateLessThanOrEqualTo(String value) {
+            addCriterion("record_state <=", value, "recordState");
+            return (Criteria) this;
+        }
+
+        public Criteria andRecordStateLike(String value) {
+            addCriterion("record_state like", value, "recordState");
+            return (Criteria) this;
+        }
+
+        public Criteria andRecordStateNotLike(String value) {
+            addCriterion("record_state not like", value, "recordState");
+            return (Criteria) this;
+        }
+
+        public Criteria andRecordStateIn(List<String> values) {
+            addCriterion("record_state in", values, "recordState");
+            return (Criteria) this;
+        }
+
+        public Criteria andRecordStateNotIn(List<String> values) {
+            addCriterion("record_state not in", values, "recordState");
+            return (Criteria) this;
+        }
+
+        public Criteria andRecordStateBetween(String value1, String value2) {
+            addCriterion("record_state between", value1, value2, "recordState");
+            return (Criteria) this;
+        }
+
+        public Criteria andRecordStateNotBetween(String value1, String value2) {
+            addCriterion("record_state not between", value1, value2, "recordState");
+            return (Criteria) this;
+        }
+
         public Criteria andCreateUserIdIsNull() {
             addCriterion("create_user_id is null");
             return (Criteria) this;
@@ -772,76 +842,6 @@ public class SysMenuExample {
 
         public Criteria andUpdateTimeNotBetween(Date value1, Date value2) {
             addCriterion("update_time not between", value1, value2, "updateTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andRecordStateIsNull() {
-            addCriterion("record_state is null");
-            return (Criteria) this;
-        }
-
-        public Criteria andRecordStateIsNotNull() {
-            addCriterion("record_state is not null");
-            return (Criteria) this;
-        }
-
-        public Criteria andRecordStateEqualTo(String value) {
-            addCriterion("record_state =", value, "recordState");
-            return (Criteria) this;
-        }
-
-        public Criteria andRecordStateNotEqualTo(String value) {
-            addCriterion("record_state <>", value, "recordState");
-            return (Criteria) this;
-        }
-
-        public Criteria andRecordStateGreaterThan(String value) {
-            addCriterion("record_state >", value, "recordState");
-            return (Criteria) this;
-        }
-
-        public Criteria andRecordStateGreaterThanOrEqualTo(String value) {
-            addCriterion("record_state >=", value, "recordState");
-            return (Criteria) this;
-        }
-
-        public Criteria andRecordStateLessThan(String value) {
-            addCriterion("record_state <", value, "recordState");
-            return (Criteria) this;
-        }
-
-        public Criteria andRecordStateLessThanOrEqualTo(String value) {
-            addCriterion("record_state <=", value, "recordState");
-            return (Criteria) this;
-        }
-
-        public Criteria andRecordStateLike(String value) {
-            addCriterion("record_state like", value, "recordState");
-            return (Criteria) this;
-        }
-
-        public Criteria andRecordStateNotLike(String value) {
-            addCriterion("record_state not like", value, "recordState");
-            return (Criteria) this;
-        }
-
-        public Criteria andRecordStateIn(List<String> values) {
-            addCriterion("record_state in", values, "recordState");
-            return (Criteria) this;
-        }
-
-        public Criteria andRecordStateNotIn(List<String> values) {
-            addCriterion("record_state not in", values, "recordState");
-            return (Criteria) this;
-        }
-
-        public Criteria andRecordStateBetween(String value1, String value2) {
-            addCriterion("record_state between", value1, value2, "recordState");
-            return (Criteria) this;
-        }
-
-        public Criteria andRecordStateNotBetween(String value1, String value2) {
-            addCriterion("record_state not between", value1, value2, "recordState");
             return (Criteria) this;
         }
     }

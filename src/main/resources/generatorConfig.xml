@@ -37,16 +37,16 @@
 		<!--生成Mapper.xml文件 -->
 		<javaClientGenerator targetPackage="com.kevin.dao.mapper" targetProject="src/main/java" type="XMLMAPPER" />
 
- 		<!--<table tableName="sys_user"></table>-->
- 		<!--<table tableName="sys_role"></table>-->
- 		<!--<table tableName="sys_user_role"></table>-->
- 		<!--<table tableName="sys_menu"></table>-->
- 		<!--<table tableName="sys_role_menu"></table>-->
- 		<!--<table tableName="pub_file"></table>-->
- 		<!--<table tableName="sys_cfg"></table>-->
- 		<!--<table tableName="sys_dict"></table>-->
- 		<table tableName="sys_log"></table>
-		<!--<table tableName="sys_org"></table>-->
- 		<!--<table tableName="sys_user_org"></table>-->
+ 		<table tableName="sys_user"></table>
+ 		<table tableName="sys_role"></table>
+ 		<table tableName="sys_user_role"></table>
+ 		<table tableName="sys_menu"></table>
+ 		<table tableName="sys_role_menu"></table>
+ 		<table tableName="pub_file"></table>
+		<table tableName="sys_cfg"></table>
+		<table tableName="sys_dict"></table>
+		<table tableName="sys_log"></table>
+		<table tableName="sys_org"></table>
+		<table tableName="sys_user_org"></table>
 	</context>
 </generatorConfiguration>

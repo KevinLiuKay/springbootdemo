@@ -516,72 +516,72 @@ public class SysUserExample {
         }
 
         public Criteria andHeadortraitpathIsNull() {
-            addCriterion("headortraitPath is null");
+            addCriterion("headortraitpath is null");
             return (Criteria) this;
         }
 
         public Criteria andHeadortraitpathIsNotNull() {
-            addCriterion("headortraitPath is not null");
+            addCriterion("headortraitpath is not null");
             return (Criteria) this;
         }
 
         public Criteria andHeadortraitpathEqualTo(String value) {
-            addCriterion("headortraitPath =", value, "headortraitpath");
+            addCriterion("headortraitpath =", value, "headortraitpath");
             return (Criteria) this;
         }
 
         public Criteria andHeadortraitpathNotEqualTo(String value) {
-            addCriterion("headortraitPath <>", value, "headortraitpath");
+            addCriterion("headortraitpath <>", value, "headortraitpath");
             return (Criteria) this;
         }
 
         public Criteria andHeadortraitpathGreaterThan(String value) {
-            addCriterion("headortraitPath >", value, "headortraitpath");
+            addCriterion("headortraitpath >", value, "headortraitpath");
             return (Criteria) this;
         }
 
         public Criteria andHeadortraitpathGreaterThanOrEqualTo(String value) {
-            addCriterion("headortraitPath >=", value, "headortraitpath");
+            addCriterion("headortraitpath >=", value, "headortraitpath");
             return (Criteria) this;
         }
 
         public Criteria andHeadortraitpathLessThan(String value) {
-            addCriterion("headortraitPath <", value, "headortraitpath");
+            addCriterion("headortraitpath <", value, "headortraitpath");
             return (Criteria) this;
         }
 
         public Criteria andHeadortraitpathLessThanOrEqualTo(String value) {
-            addCriterion("headortraitPath <=", value, "headortraitpath");
+            addCriterion("headortraitpath <=", value, "headortraitpath");
             return (Criteria) this;
         }
 
         public Criteria andHeadortraitpathLike(String value) {
-            addCriterion("headortraitPath like", value, "headortraitpath");
+            addCriterion("headortraitpath like", value, "headortraitpath");
             return (Criteria) this;
         }
 
         public Criteria andHeadortraitpathNotLike(String value) {
-            addCriterion("headortraitPath not like", value, "headortraitpath");
+            addCriterion("headortraitpath not like", value, "headortraitpath");
             return (Criteria) this;
         }
 
         public Criteria andHeadortraitpathIn(List<String> values) {
-            addCriterion("headortraitPath in", values, "headortraitpath");
+            addCriterion("headortraitpath in", values, "headortraitpath");
             return (Criteria) this;
         }
 
         public Criteria andHeadortraitpathNotIn(List<String> values) {
-            addCriterion("headortraitPath not in", values, "headortraitpath");
+            addCriterion("headortraitpath not in", values, "headortraitpath");
             return (Criteria) this;
         }
 
         public Criteria andHeadortraitpathBetween(String value1, String value2) {
-            addCriterion("headortraitPath between", value1, value2, "headortraitpath");
+            addCriterion("headortraitpath between", value1, value2, "headortraitpath");
             return (Criteria) this;
         }
 
         public Criteria andHeadortraitpathNotBetween(String value1, String value2) {
-            addCriterion("headortraitPath not between", value1, value2, "headortraitpath");
+            addCriterion("headortraitpath not between", value1, value2, "headortraitpath");
             return (Criteria) this;
         }
 
