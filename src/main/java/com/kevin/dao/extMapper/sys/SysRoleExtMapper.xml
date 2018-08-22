@@ -8,7 +8,10 @@
 		</collection>
 	</resultMap>
 	<resultMap id="roleMap" type="com.kevin.model.SysRole">
+		<id column="role_id" property="roleId" jdbcType="VARCHAR" />
+		<result column="role_name" property="roleName" jdbcType="VARCHAR" />
 	</resultMap>
+
 	<!-- 通过roleId，userIdList查找关联表信息 -->
 	<select id="queryRoleUserList" parameterType="java.util.Map" resultMap="com.kevin.dao.mapper.SysUserRoleMapper.BaseResultMap">
 		select

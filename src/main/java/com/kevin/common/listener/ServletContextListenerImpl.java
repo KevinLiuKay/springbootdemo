@@ -100,64 +100,24 @@ public class ServletContextListenerImpl implements ServletContextListener {
 	/**
 	 * 加载字典
 	 */
-	private static Map<String, Map<String, String>> sysDictNameMap;
 	private static void _loadDict(ServletContext context) {
 		Map<String, List<SysDict>> sysListDictMap = new HashMap<String, List<SysDict>>();
 		Map<String, String> sysDictIdMap = new HashMap<String, String>();
-		Map<String, Map<String, String>> sysDictNameMap = new HashMap<String, Map<String, String>>();
 		//从字典枚举类从读取枚举数据
 		List<DictTypeEnum> dictTypeEnumList = (List<DictTypeEnum>) EnumUtil.toList(DictTypeEnum.class);
 		for(DictTypeEnum dictTypeEnum : dictTypeEnumList){		
 			String dictTypeId = dictTypeEnum.getId();
-			Map<String, String> dictNameMap = new HashMap<String, String>();
-			sysDictNameMap.put(dictTypeId, dictNameMap);
 			SysDict sysDict = new SysDict();
 			sysDict.setDictTypeId(dictTypeId);
 			sysDict.setRecordState(GlobalConstant.Y);
-			
 			List<SysDict> sysDictList = dictService.queryList(sysDict, GlobalConstant.SORT_KEY);
 			for(SysDict dict : sysDictList){
 				String typeId = dict.getDictTypeId()+"."+dict.getDictId();
 				sysDictIdMap.put(typeId, dict.getDictValue());
-				dictNameMap.put(dict.getDictValue(), dict.getDictKey());
-				if(dictTypeEnum.getLevel()>1){
-					sysDict.setDictTypeId(typeId);
-					List<SysDict> sysDictSecondList = dictService.queryList(sysDict, GlobalConstant.SORT_KEY);
-					
-					if(sysDictSecondList!=null && sysDictSecondList.size()>0){
-						for(SysDict sDict : sysDictSecondList){
-							String tTypeId = typeId+"."+sDict.getDictId();
-							String tTypeName = dict.getDictValue()+"."+sDict.getDictValue();
-							
-							sysDictIdMap.put(tTypeId,tTypeName);
-							
-							if(dictTypeEnum.getLevel()>2){
-								sysDict.setDictTypeId(tTypeId);
-								List<SysDict> sysDictThirdList = dictService.queryList(sysDict, GlobalConstant.SORT_KEY);
-								
-								if(sysDictThirdList!=null && sysDictThirdList.size()>0){
-									for(SysDict tDict : sysDictThirdList){
-										sysDictIdMap.put(tTypeId+"."+tDict.getDictId(), tTypeName+"."+tDict.getDictValue());
-									}
-								}
-								
-								sysListDictMap.put(tTypeId, sysDictThirdList);
-								context.setAttribute("dictTypeEnum"+tTypeId+"List", sysDictThirdList);
-							}
-							
-						}
-					}
-					
-					sysListDictMap.put(typeId, sysDictSecondList);
-					context.setAttribute("dictTypeEnum"+typeId+"List", sysDictSecondList);
-				}
 			}
-
 			sysListDictMap.put(dictTypeId, sysDictList);
 			context.setAttribute("dictTypeEnum"+dictTypeEnum.name()+"List", sysDictList);
 		}
-//		GlobalContext.sysDictListMap = sysListDictMap;
-//		ServletContextListenerImpl.sysDictNameMap = sysDictNameMap;
 		DictTypeEnum.sysDictIdMap = sysDictIdMap;
 		DictTypeEnum.sysListDictMap = sysListDictMap;
 	}
@@ -165,10 +125,10 @@ public class ServletContextListenerImpl implements ServletContextListener {
 	/**
 	 * 加载枚举
 	 */
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private static void _loadEnum(ServletContext context){
 		Set<Class<?>> set = ClassUtil.getClasses("com.kevin.enums");
 		for(Class<?> cls : set){		
-			@SuppressWarnings({ "unchecked", "rawtypes" })
 			List<GeneralEnum> enumList = (List<GeneralEnum>) EnumUtil.toList((Class<? extends GeneralEnum>) cls);
 			context.setAttribute(StringUtils.uncapitalize(cls.getSimpleName())+"List", enumList);
 			for(@SuppressWarnings("rawtypes") GeneralEnum genum : enumList){	

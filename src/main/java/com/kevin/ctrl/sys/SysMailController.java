@@ -14,7 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.thymeleaf.TemplateEngine;
 
 @RestController
-@RequestMapping("/mail")
+@RequestMapping("/sysMail")
 @Api(value = "mailManage", tags = "mailManage")
 public class SysMailController {
     @Autowired

@@ -170,15 +170,13 @@ public class LoginController extends CommonController {
 
 	/**
 	 * session过期
-	 * 
 	 * @param request
 	 * @return
 	 */
     @RequestMapping(value = "/timeout", method = { RequestMethod.POST })
     @ApiOperation(value = "session过期", notes = "session过期", code = 200, produces = "application/json")
 	public JsonResult timeout(HttpServletRequest request) {
-		logger.debug("-----> timeout !");
-	    return new JsonResult(false, "请重新登录！", null);
+        return new JsonResult(false, "未登录或长时间未操作，请重新登录！", null);
 	}
     
 }

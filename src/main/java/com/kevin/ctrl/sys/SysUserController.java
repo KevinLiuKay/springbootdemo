@@ -26,7 +26,7 @@ import java.util.List;
  * @author lzk
  */
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/sysUser")
 @Api(value = "userManage", tags = "userManage")
 public class SysUserController {
     private static final Logger logger = LoggerFactory.getLogger(SysUserController.class);

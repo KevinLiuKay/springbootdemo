@@ -3,7 +3,6 @@ package com.kevin.ctrl.sys;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Resource;
-
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.kevin.common.GlobalConstant.GlobalConstant;
@@ -25,7 +24,7 @@ import io.swagger.annotations.ApiParam;
  * @author lzk
  */
 @RestController
-@RequestMapping("/dict")
+@RequestMapping("/sysDict")
 @Api(value = "dictionaryManage", tags = "dictionaryManage")
 public class SysDictController {
 	

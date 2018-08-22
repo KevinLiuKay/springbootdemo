@@ -29,7 +29,7 @@ import java.util.List;
  * @author lzk
  */
 @RestController
-@RequestMapping("/role")
+@RequestMapping("/sysRole")
 @Api(value = "roleManage", tags = "roleManage")
 public class SysRoleController {
     private static final Logger logger = LoggerFactory.getLogger(SysRoleController.class);

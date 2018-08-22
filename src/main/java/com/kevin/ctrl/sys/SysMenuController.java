@@ -22,7 +22,7 @@ import java.util.List;
  * @author lzk
  */
 @RestController
-@RequestMapping("/menu")
+@RequestMapping("/sysMenu")
 @Api(value = "menuManage", tags = "menuManage")
 public class SysMenuController {
     private static final Logger logger = LoggerFactory.getLogger(SysMenuController.class);
