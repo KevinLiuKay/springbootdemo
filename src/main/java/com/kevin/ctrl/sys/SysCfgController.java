@@ -3,6 +3,7 @@ package com.kevin.ctrl.sys;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.kevin.common.GlobalConstant.GlobalConstant;
+import com.kevin.common.listener.ServletContextListenerImpl;
 import com.kevin.common.utils.JsonResult;
 import com.kevin.model.SysCfg;
 import com.kevin.model.SysRole;
@@ -16,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import java.util.HashMap;
 import java.util.List;
@@ -78,5 +80,19 @@ public class SysCfgController  {
 		}
 		return jsonResult;
 	}
-	
+
+	@RequestMapping(value="/doRefresh" , method={RequestMethod.POST})
+	@ApiOperation(value = "刷新服务器", notes = "刷新服务器", code = 200, produces = "application/json")
+	public JsonResult doRefresh(HttpServletRequest request) {
+		JsonResult jsonResult = new JsonResult();
+		jsonResult.setStatus(false);
+		///ServletRequest的getServletContext方法是Servlet3.0添加的
+		//return InitializedContext.refresh(request.getServletContext());
+		String result = ServletContextListenerImpl.refresh(request.getSession().getServletContext());
+		if(GlobalConstant.OPERATE_SUCCESSED.equals(result)) {
+			jsonResult.setStatus(true);
+			jsonResult.setMessage(GlobalConstant.OPERATE_SUCCESSED);
+		}
+		return jsonResult;
+	}
 }

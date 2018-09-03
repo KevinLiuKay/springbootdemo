@@ -5,7 +5,9 @@ import com.kevin.common.GlobalConstant.GlobalConstant;
 import com.kevin.common.core.HttpServletContext;
 import com.kevin.common.utils.ExportUtil;
 import com.kevin.common.utils.JsonResult;
+import com.kevin.model.PubFile;
 import com.kevin.model.SysUser;
+import com.kevin.service.pub.IUploadFileService;
 import com.kevin.service.sys.ISysUserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -33,6 +35,8 @@ public class FileController {
     protected static String USER_NAME = "用户列表";
     @Autowired
     private ISysUserService sysUserService;
+    @Autowired
+    private IUploadFileService uploadFileService;
 
     @ApiOperation(value = "单个附件上传", notes = "单个附件上传", code = 200, produces = "application/json")
     @RequestMapping(value = "/upload", method = RequestMethod.POST)
@@ -154,5 +158,9 @@ public class FileController {
         ExportUtil.exportExcel(response, result.getWorkBook(), USER_NAME);
     }
 
-
+    @ApiOperation(value = "单张图片上传后转为Base64传到前台", notes = "单张图片上传后转为Base64传到前台", code = 200, produces = "application/json")
+    @RequestMapping(value = "/uploadSinglePicture", method = RequestMethod.POST)
+    public JsonResult uploadSinglePicture( @RequestParam(name = "file", required = false) MultipartFile file) {
+        return uploadFileService.uploadSinglePicture(file);
+    }
 }

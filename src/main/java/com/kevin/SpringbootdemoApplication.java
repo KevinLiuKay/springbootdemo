@@ -10,6 +10,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.http.HttpMessageConverters;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
+import org.springframework.boot.web.servlet.MultipartConfigFactory;
 import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.cache.annotation.EnableCaching;
@@ -25,6 +26,7 @@ import org.springframework.web.filter.CorsFilter;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
+import javax.servlet.MultipartConfigElement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,6 +39,7 @@ import java.util.List;
 @EnableSwagger2
 @ServletComponentScan
 @EnableCaching// 开启缓存，需要显示的指定
+@Configuration
 @MapperScan({"com.kevin.dao.mapper","com.kevin.dao.extMapper"})
 public class SpringbootdemoApplication extends SpringBootServletInitializer {
 
@@ -127,5 +130,19 @@ public class SpringbootdemoApplication extends SpringBootServletInitializer {
     @Bean(name = "httpContextFilter")
     public javax.servlet.Filter httpContextFilter() {
         return new HttpContextFilter();
+    }
+
+    /**
+     * 配置上传文件大小的配置
+     * @return
+     */
+    @Bean
+    public MultipartConfigElement multipartConfigElement() {
+        MultipartConfigFactory factory = new MultipartConfigFactory();
+        //  单个数据大小
+        factory.setMaxFileSize("100MB");
+        /// 总上传数据大小
+        factory.setMaxRequestSize("100MB");
+        return factory.createMultipartConfig();
     }
 }

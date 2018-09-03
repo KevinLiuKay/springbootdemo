@@ -7,6 +7,8 @@ import javax.servlet.http.HttpServletResponse;
 import com.kevin.common.GlobalConstant.GlobalConstant;
 import com.kevin.common.core.HttpServletContext;
 import com.kevin.model.SysUser;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -22,16 +24,12 @@ public class UserInterceptor implements HandlerInterceptor {
 	/**
 	 * rootUrl
 	 */
-	private static Map<String, String> EXCLUDE_MAPPING;
+	private static Map<String, Boolean> EXCLUDE_MAPPING;
 
 	static {
-		EXCLUDE_MAPPING = new HashMap<String, String>();;
-		EXCLUDE_MAPPING.put("sysCfg", "sysCfg");
-		EXCLUDE_MAPPING.put("sysLog", "sysLog");
-		EXCLUDE_MAPPING.put("sysMenu", "sysMenu");
-		EXCLUDE_MAPPING.put("sysRole", "sysRole");
-		EXCLUDE_MAPPING.put("sysMenu", "sysMenu");
-		EXCLUDE_MAPPING.put("sysUser", "sysUser");
+		EXCLUDE_MAPPING = new HashMap<String, Boolean>();
+		EXCLUDE_MAPPING.put("sysCfg", true);
+		EXCLUDE_MAPPING.put("sysLog", true);
 	}
 
 	/**
@@ -40,9 +38,9 @@ public class UserInterceptor implements HandlerInterceptor {
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object obj) throws Exception {
 		String getPath = request.getRequestURL().toString();
-		String requestUri = request.getRequestURI();  
+		String requestUrl = request.getRequestURI();
         String contextPath = request.getContextPath();  
-        String url = requestUri.substring(contextPath.length());
+        String url = requestUrl.substring(contextPath.length());
         
         /**
          * 截取请求前缀： inspect
@@ -58,11 +56,11 @@ public class UserInterceptor implements HandlerInterceptor {
         logger.debug("-----> urlPrefix:"+ urlPrefix);
 		SysUser currUser = HttpServletContext.getCurrentUser();
 		if (currUser == null) {
+			request.getRequestDispatcher("/login/timeout").forward(request, response);
+			return false;
+		}else{//==》权限拦截，控制非法访问！
 			if(EXCLUDE_MAPPING.get(urlPrefix) != null) {
 				return true;
-			}else {
-				request.getRequestDispatcher("/login/timeout").forward(request, response);
-				return false;
 			}
 		}
 		return true;

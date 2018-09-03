@@ -1,7 +1,6 @@
 package com.kevin.ctrl.pub;
 
 import javax.servlet.http.HttpServletRequest;
-
 import org.apache.shiro.ShiroException;
 import org.apache.shiro.authz.UnauthorizedException;
 import org.slf4j.Logger;
@@ -10,11 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-
-import com.fasterxml.jackson.core.json.JsonReadContext;
-import com.kevin.common.shiro.ShiroConfig;
 import com.kevin.common.utils.JsonResult;
-
+import java.lang.reflect.UndeclaredThrowableException;
 
 /**
  * @author lzk
@@ -25,7 +21,9 @@ public class ExceptionController {
 	
 	private static Logger logger = LoggerFactory.getLogger(ExceptionController.class);
 
-    // 捕捉shiro的异常
+    /**
+     * 捕捉shiro的异常
+     */
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ExceptionHandler(ShiroException.class)
     public JsonResult handle401(ShiroException e) {
@@ -33,7 +31,9 @@ public class ExceptionController {
         return new JsonResult(false, e.getMessage(), null);
     }
 
-    // 捕捉UnauthorizedException
+    /**
+     *  捕捉UnauthorizedException
+     */
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ExceptionHandler(UnauthorizedException.class)
     public JsonResult handle401() {
@@ -41,12 +41,23 @@ public class ExceptionController {
         return new JsonResult(false, "Unauthorized", null);
     }
 
-    // 捕捉其他所有异常
+    /**
+     * 捕捉其他所有异常
+     */
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public JsonResult globalException(HttpServletRequest request, Throwable ex) {
-        logger.debug("-----> e.getMessage():"+ex.getMessage());
-        return new JsonResult(false, ex.getMessage(), null);
+        String msg = null;
+        if (ex instanceof UndeclaredThrowableException){
+            Throwable targetEx = ((UndeclaredThrowableException) ex).getUndeclaredThrowable();
+            if (targetEx != null){
+                msg = targetEx.getMessage();
+            }
+        } else {
+            msg = ex.getMessage();
+        }
+        logger.debug("-----> e.getMessage():"+msg);
+        return new JsonResult(false, msg, null);
     }
 
     private HttpStatus getStatus(HttpServletRequest request) {

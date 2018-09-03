@@ -27,7 +27,7 @@ public class PubFileServiceImpl implements IPubFileService {
 
     @Override
     public int save(PubFile pubFile) {
-        if (pubFile.getFileId() == null) {
+        if (StringUtils.isBlank(pubFile.getFileId())) {
             pubFile.setFileId(UUIDUtil.getUUID());
             GeneralMethod.setRecordInfo(pubFile, true);
             return fileMapper.insertSelective(pubFile);

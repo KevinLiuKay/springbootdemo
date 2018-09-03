@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
-@Transactional
+@Transactional(rollbackFor=Exception.class)
 public class FileServiceImpl implements IFileService {
 
 	private static Logger logger = LoggerFactory.getLogger(FileServiceImpl.class);
@@ -214,8 +214,9 @@ public class FileServiceImpl implements IFileService {
 			out = new ByteArrayOutputStream(length);
 			byte[] b = new byte[length];
 			int n;
-			while ((n = stream.read(b)) != -1)
+			while ((n = stream.read(b)) != -1){
 				out.write(b, 0, n);
+			}
 			return out.toByteArray();
 		} catch (IOException e) {
 			logger.debug("-----> catch Exception:" + e.getMessage());

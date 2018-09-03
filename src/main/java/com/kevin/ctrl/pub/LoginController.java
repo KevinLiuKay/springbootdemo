@@ -103,6 +103,7 @@ public class LoginController extends CommonController {
         jsonResult.setMessage(GlobalConstant.LOGIN_SUCCESS);
         Map<String,Object> resultMap = new HashMap<String,Object>();
         String token = JWTUtil.sign(currUser.getUserId(), currUser.getUserPwd());
+        logger.debug("-----> token:" + token);
         //认证
 		resultMap.put("token", token);
         //当前登录用户
@@ -116,7 +117,6 @@ public class LoginController extends CommonController {
 
     /**
      * 获得客户端的ip地址
-     * 
      * @param request
      * @return
      */
@@ -133,14 +133,7 @@ public class LoginController extends CommonController {
         }
         return ip;
     }
-    
-	/**
-	 * 退出登录
-	 * @param request
-	 * @param response
-	 * @return
-	 * @throws Exception
-	 */
+
     @RequestMapping(value = "/exit",method = {RequestMethod.POST})
     @ApiOperation(value = "退出登录", notes = "退出登录", code = 200, produces = "application/json")
     public JsonResult exit(HttpServletRequest request, HttpServletResponse response) {
@@ -168,15 +161,10 @@ public class LoginController extends CommonController {
         return jsonResult;
      }
 
-	/**
-	 * session过期
-	 * @param request
-	 * @return
-	 */
     @RequestMapping(value = "/timeout", method = { RequestMethod.POST })
     @ApiOperation(value = "session过期", notes = "session过期", code = 200, produces = "application/json")
 	public JsonResult timeout(HttpServletRequest request) {
         return new JsonResult(false, "未登录或长时间未操作，请重新登录！", null);
 	}
-    
+
 }
