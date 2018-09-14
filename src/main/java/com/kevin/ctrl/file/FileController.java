@@ -7,12 +7,14 @@ import com.kevin.common.utils.ExportUtil;
 import com.kevin.common.utils.JsonResult;
 import com.kevin.model.PubFile;
 import com.kevin.model.SysUser;
+import com.kevin.service.pub.IPubFileService;
 import com.kevin.service.pub.IUploadFileService;
 import com.kevin.service.sys.ISysUserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +24,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
+import java.net.URLEncoder;
 import java.util.List;
 
 @RestController
@@ -29,6 +32,8 @@ import java.util.List;
 @Api(value = "fileManage", tags = "fileManage")
 public class FileController {
     private static final Logger logger = LoggerFactory.getLogger(FileController.class);
+    @Autowired
+    private IPubFileService pubFileService;
 
     protected static Object[] USER_PARAMS = {"userName","userAcc","userGender","userPhone","userAddr"};
     protected static String[] USER_PARAMNAMES = new String[]{"用户名","用户账号","性别","手机号","地址"};
@@ -162,5 +167,54 @@ public class FileController {
     @RequestMapping(value = "/uploadSinglePicture", method = RequestMethod.POST)
     public JsonResult uploadSinglePicture( @RequestParam(name = "file", required = false) MultipartFile file) {
         return uploadFileService.uploadSinglePicture(file);
+    }
+
+    @RequestMapping(value = "/fileDownload",method = {RequestMethod.GET, RequestMethod.POST})
+    @ApiOperation(value = "文件下载", notes = "文件下载", code = 200, produces = "application/json")
+    public JsonResult fileDownload(String id, HttpServletResponse response) {
+        JsonResult jsonResult = new JsonResult();
+        jsonResult.setStatus(false);
+        jsonResult.setMessage(GlobalConstant.DOWNLOAD_FAIL);
+        if(StringUtils.isBlank(id)) {
+            return jsonResult;
+        }
+        PubFile pubFile = pubFileService.getById(id);
+        response.setHeader("content-type", "application/octet-stream");
+        response.setContentType("application/octet-stream");
+        byte[] buff = new byte[1024];
+        BufferedInputStream bis = null;
+        OutputStream os = null;
+        try {
+            response.setHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(pubFile.getFileName(), "UTF-8") );
+            os = response.getOutputStream();
+            File file = new File(pubFile.getFilePath());
+            if(!file.exists()){
+                return jsonResult;
+            }
+            //下载速度设置
+            response.setContentLength((int)file.length());
+            bis = new BufferedInputStream(new FileInputStream(file));
+            int i = bis.read(buff);
+            while (i != -1) {
+                os.write(buff, 0, buff.length);
+                os.flush();
+                i = bis.read(buff);
+            }
+            jsonResult.setStatus(true);
+            jsonResult.setMessage(GlobalConstant.DOWNLOAD_SUCCESSED);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }finally {
+            if (bis != null) {
+                try {
+                    bis.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return jsonResult;
     }
 }

@@ -208,6 +208,9 @@ public class GlobalConstant {
 	public static final String UPLOAD_SUCCESSED = "上传成功！";
 	public static final String UPLOAD_FAIL = "上传失败！";
 
+	public static final String DOWNLOAD_SUCCESSED = "下载成功！";
+	public static final String DOWNLOAD_FAIL = "下载失败！";
+
 	public static final String EXPORT_SUCCESSED = "导出成功！";
 	public static final String EXPORT_FAIL = "上传失败！";
 

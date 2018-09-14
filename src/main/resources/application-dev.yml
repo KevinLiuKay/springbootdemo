@@ -1,6 +1,15 @@
 server: #server config
-  servlet.context-path: /springbootdemo
-  port: 8888
+  servlet.context-path: /springbootdemo/api
+  port: 443
+  #Springboot配置使用ssl，使用https
+  #生成证书命令：keytool -genkey -alias tomcat -keyalg RSA -keystore D:/tomcat.keystore
+  ssl:
+  #你生成的证书名字
+    key-store: tomcat.keystore
+  #密钥库密码
+    key-store-password: 123456
+    keyStoreType: JKS
+    keyAlias: tomcat
 spring:
   main: #spring boot config
     show-banner: false #关闭bannev

@@ -10,10 +10,63 @@ Target Server Type    : MYSQL
 Target Server Version : 50717
 File Encoding         : 65001
 
-Date: 2018-08-15 20:14:33
+Date: 2018-09-14 15:04:15
 */
 
 SET FOREIGN_KEY_CHECKS=0;
+
+-- ----------------------------
+-- Table structure for assessment
+-- ----------------------------
+DROP TABLE IF EXISTS `assessment`;
+CREATE TABLE `assessment` (
+  `id` varchar(50) NOT NULL,
+  `type` int(11) DEFAULT NULL,
+  `title` varchar(255) DEFAULT NULL,
+  `sort_num` int(11) DEFAULT NULL,
+  `create_user_id` varchar(50) DEFAULT NULL,
+  `create_time` datetime DEFAULT NULL,
+  `update_user_id` varchar(50) DEFAULT NULL,
+  `update_time` datetime DEFAULT NULL,
+  `record_state` varchar(50) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='考核项目表';
+
+-- ----------------------------
+-- Records of assessment
+-- ----------------------------
+INSERT INTO `assessment` VALUES ('001', '1', '20项指标提前完成全年任务', '1', null, null, null, null, 'Y');
+INSERT INTO `assessment` VALUES ('002', '2', '42项指标已经完成序时进度', '2', null, null, null, null, 'Y');
+INSERT INTO `assessment` VALUES ('003', '3', '5项指标落后进度要求', '3', null, null, null, null, 'Y');
+
+-- ----------------------------
+-- Table structure for assessment_detail
+-- ----------------------------
+DROP TABLE IF EXISTS `assessment_detail`;
+CREATE TABLE `assessment_detail` (
+  `id` varchar(50) NOT NULL COMMENT '考核主键',
+  `title` varchar(255) DEFAULT NULL COMMENT '考核标题',
+  `type` varchar(255) DEFAULT NULL COMMENT '考核分类',
+  `num` int(11) DEFAULT NULL COMMENT '考核序号',
+  `complete` double(2,0) DEFAULT NULL COMMENT '完成',
+  `targetValue` double(2,0) DEFAULT NULL COMMENT '指标值',
+  `target` varchar(255) DEFAULT NULL COMMENT '指标',
+  `company` varchar(255) DEFAULT NULL COMMENT '单位',
+  `checkDept` varchar(255) DEFAULT NULL COMMENT '考核部门',
+  `weight` int(11) DEFAULT NULL COMMENT '权重',
+  `chargeDept` varchar(255) DEFAULT NULL COMMENT '负责部门',
+  `content` varchar(1000) DEFAULT NULL,
+  `create_user_id` varchar(50) DEFAULT NULL,
+  `create_time` datetime DEFAULT NULL,
+  `update_user_id` varchar(50) DEFAULT NULL,
+  `update_time` datetime DEFAULT NULL,
+  `record_state` varchar(1) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='考核详情表';
+
+-- ----------------------------
+-- Records of assessment_detail
+-- ----------------------------
 
 -- ----------------------------
 -- Table structure for pub_file
@@ -26,7 +79,7 @@ CREATE TABLE `pub_file` (
   `file_typeId` varchar(50) DEFAULT NULL,
   `file_suffix` varchar(50) DEFAULT NULL,
   `file_size` double DEFAULT NULL,
-  `file_path` varchar(50) DEFAULT NULL,
+  `file_path` varchar(100) DEFAULT NULL,
   `record_state` varchar(1) DEFAULT NULL,
   `create_user_id` varchar(50) DEFAULT NULL,
   `create_time` datetime DEFAULT NULL,
@@ -38,6 +91,8 @@ CREATE TABLE `pub_file` (
 -- ----------------------------
 -- Records of pub_file
 -- ----------------------------
+INSERT INTO `pub_file` VALUES ('001', '趣味打击乐--垃圾桶齐奏.mp4', null, null, 'mp4', null, 'D:\\download\\lajitongqizou.mp4', 'Y', null, null, null, null);
+INSERT INTO `pub_file` VALUES ('002', 'test.jpg', null, null, null, null, 'D:\\download\\test.jpg', 'Y', null, null, null, null);
 
 -- ----------------------------
 -- Table structure for sys_cfg
@@ -62,7 +117,7 @@ CREATE TABLE `sys_cfg` (
 -- ----------------------------
 INSERT INTO `sys_cfg` VALUES ('accept_excel_mime', 'application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', '允许上传Excel的MIME类型', 'sys', null, 'Y', '00000000000000000000000000000000', '2016-08-03 11:33:57', '00000000000000000000000000000000', '2018-06-20 14:01:10');
 INSERT INTO `sys_cfg` VALUES ('accept_excel_suffix', '.xls,.xlsx', '允许上传Excel的后缀名', 'sys', null, 'Y', '00000000000000000000000000000000', '2016-08-03 11:33:57', '00000000000000000000000000000000', '2018-06-20 14:01:10');
-INSERT INTO `sys_cfg` VALUES ('accept_file_size_limit', '6', '允许上传文件大小限制(M)', 'sys', null, 'Y', '00000000000000000000000000000000', '2016-08-03 11:33:57', '00000000000000000000000000000000', '2018-06-20 14:01:10');
+INSERT INTO `sys_cfg` VALUES ('accept_file_size_limit', '20', '允许上传文件大小限制(M)', 'sys', null, 'Y', '00000000000000000000000000000000', '2016-08-03 11:33:57', '00000000000000000000000000000000', '2018-06-20 14:01:10');
 INSERT INTO `sys_cfg` VALUES ('accept_file_suffix', '.jpg,.jpeg,.bmp,.png,.txt,.doc,.docx,.xls,.xlsx,.ppt,.zip,.rar', '允许上传文件后缀名', 'sys', null, 'Y', '00000000000000000000000000000000', '2016-08-03 11:33:57', '00000000000000000000000000000000', '2018-06-20 14:01:10');
 INSERT INTO `sys_cfg` VALUES ('accept_image_mime', 'image/bmp,image/gif,image/jpeg,image/png', '允许上传图片的MIME类型', 'sys', null, 'Y', '00000000000000000000000000000000', '2016-08-03 11:33:57', '00000000000000000000000000000000', '2018-06-20 14:01:10');
 INSERT INTO `sys_cfg` VALUES ('accept_image_suffix', '.jpg,.jpeg,.bmp,.png', '允许上传图片的后缀名', 'sys', null, 'Y', '00000000000000000000000000000000', '2016-08-03 11:33:57', '00000000000000000000000000000000', '2018-06-20 14:01:10');
