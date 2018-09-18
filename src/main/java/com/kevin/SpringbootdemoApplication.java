@@ -140,9 +140,9 @@ public class SpringbootdemoApplication extends SpringBootServletInitializer {
     public MultipartConfigElement multipartConfigElement() {
         MultipartConfigFactory factory = new MultipartConfigFactory();
         //  单个数据大小
-        factory.setMaxFileSize("100MB");
+        factory.setMaxFileSize(-1);
         /// 总上传数据大小
-        factory.setMaxRequestSize("100MB");
+        factory.setMaxRequestSize(-1);
         return factory.createMultipartConfig();
     }
 }

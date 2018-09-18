@@ -79,9 +79,13 @@ spring:
   aop: #AOP config
     auto: true
     proxy-target-class: false
+# spring-activiti
   activiti:
+    #自动部署验证设置:true-开启（默认）、false-关闭
     check-process-definitions: false
-
+    # asyncExecutorEnabled属性设置设置true后将代替那些老的Job executor
+    async-executor-enabled: false
+    job-executor-activate: false
   mybatis:
       type-aliases-package: com.kevin.model
       mapper-locations: classpath:com/kevin/dao/*/*.xml

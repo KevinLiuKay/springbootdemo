@@ -6,16 +6,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.HandlerInterceptor;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
-import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+import org.springframework.web.servlet.config.annotation.*;
 
 /**
  * @author lzk
  */
 @Configuration
-public class MyWebMvcConfigurerAdapter extends WebMvcConfigurerAdapter {
+public class MyWebMvcConfigurerAdapter  extends WebMvcConfigurationSupport {
     private Logger logger = LoggerFactory.getLogger(MyWebMvcConfigurerAdapter.class);
 
     //把我们的拦截器注入为bean
