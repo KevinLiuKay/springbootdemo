@@ -35,12 +35,12 @@ import java.util.List;
  */
 @EnableScheduling       // 启用定时任务
 @EnableTransactionManagement    // 开启注解事务管理，等同于xml配置文件中的 <tx:annotation-driven />
-@SpringBootApplication
 @EnableSwagger2
 @ServletComponentScan
-@EnableCaching// 开启缓存，需要显示的指定
+@EnableCaching  // 开启缓存，需要显示的指定
 @Configuration
 @MapperScan({"com.kevin.dao.mapper","com.kevin.dao.extMapper"})
+@SpringBootApplication
 public class SpringbootdemoApplication extends SpringBootServletInitializer {
 
     public static void main(String[] args) {
@@ -83,32 +83,7 @@ public class SpringbootdemoApplication extends SpringBootServletInitializer {
             return new CorsFilter(source);
         }
     }
-    /**
-     * 使用@Bean注入fastJsonHttpMessageConvert
-     */
-    @Bean
-    public HttpMessageConverters fastJsonHttpMessageConverters() {
-        // 1、需要先定义一个 convert 转换消息的对象;
-        FastJsonHttpMessageConverter fastConverter = new FastJsonHttpMessageConverter();
-        //2、添加fastJson 的配置信息，比如：是否要格式化返回的json数据;
-        FastJsonConfig fastJsonConfig = new FastJsonConfig();
-        // 空值特别处理
-        // WriteNullListAsEmpty 将Collection类型字段的字段空值输出为[]
-        // WriteNullStringAsEmpty 将字符串类型字段的空值输出为空字符串 ""
-        // WriteNullNumberAsZero 将数值类型字段的空值输出为0
-        // WriteNullBooleanAsFalse 将Boolean类型字段的空值输出为false
-        fastJsonConfig.setSerializerFeatures(SerializerFeature.PrettyFormat, SerializerFeature.WriteNullListAsEmpty,
-                SerializerFeature.WriteNullStringAsEmpty);
-        //fastJsonConfig.setSerializerFeatures(SerializerFeature.PrettyFormat);
-        //3、在convert中添加配置信息.
-        //处理中文乱码问题
-        List<MediaType> fastMediaTypes = new ArrayList<>();
-        fastMediaTypes.add(MediaType.APPLICATION_JSON_UTF8);
-        fastConverter.setSupportedMediaTypes(fastMediaTypes);
-        fastConverter.setFastJsonConfig(fastJsonConfig);
-        HttpMessageConverter<?> converter = fastConverter;
-        return new HttpMessageConverters(converter);
-    }
+
     /**
      * 配置过滤器
      * @return

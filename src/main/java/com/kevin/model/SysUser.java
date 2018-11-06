@@ -1,5 +1,7 @@
 package com.kevin.model;
 
+import com.alibaba.fastjson.annotation.JSONField;
+
 import java.util.Date;
 
 public class SysUser {
@@ -8,7 +10,10 @@ public class SysUser {
     private String userName;
 
     private String userAcc;
-
+    /*
+     * serialize:是否需要序列化属性.
+     */
+    @JSONField(serialize=false)
     private String userPwd;
 
     private String userPhone;
@@ -20,11 +25,11 @@ public class SysUser {
     private String userAddr;
 
     private String createUserId;
-
+    @JSONField(format="yyyy-MM-dd HH:mm")
     private Date createTime;
 
     private String updateUserId;
-
+    @JSONField(format="yyyy-MM-dd HH:mm")
     private Date updateTime;
 
     private String recordState;
