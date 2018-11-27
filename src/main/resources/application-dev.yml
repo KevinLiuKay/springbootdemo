@@ -72,11 +72,12 @@ spring:
   messages: #i18n config
     basename: i18n/messages
    
-  thymeleaf: #thymeleaf config
-    mode: HTML5
-    encoding: UTF-8
-    spring.thymeleaf.servlet.content-type: text/html
+  thymeleaf:
     cache: false
+    prefix: classpath:/templates/
+    suffix: .html
+    encoding: UTF-8
+    mode: HTML5
     
   aop: #AOP config
     auto: true
@@ -91,3 +92,9 @@ spring:
   mybatis:
       type-aliases-package: com.kevin.model
       mapper-locations: classpath:com/kevin/dao/*/*.xml
+#ROOT_PATH: /springbootdemo
+ROOT_PATH: D:\idealWorkspace\projects\springbootdemo\src\main\resources
+#html保存的上传地址
+TEST_UPLOAD_HTML_URL: ${ROOT_PATH}/static/savehtml/
+#html信息内容模板
+TEST_HTML_TEMPLATE_URL: ${ROOT_PATH}/static/template/wx_template.html
