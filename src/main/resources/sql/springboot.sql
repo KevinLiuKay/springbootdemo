@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50717
 File Encoding         : 65001
 
-Date: 2018-09-14 15:04:15
+Date: 2018-12-04 17:05:09
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -69,6 +69,29 @@ CREATE TABLE `assessment_detail` (
 -- ----------------------------
 
 -- ----------------------------
+-- Table structure for auto_id_bean
+-- ----------------------------
+DROP TABLE IF EXISTS `auto_id_bean`;
+CREATE TABLE `auto_id_bean` (
+  `code` varchar(80) CHARACTER SET utf8 NOT NULL COMMENT '主键',
+  `num` bigint(20) DEFAULT NULL COMMENT '备用字段',
+  `name` varchar(100) CHARACTER SET utf8 DEFAULT 'qxzwb' COMMENT '项目名预留为相同code时防止共用',
+  `cur_num` bigint(20) DEFAULT '1' COMMENT '当前数字',
+  `update_time` datetime DEFAULT NULL,
+  `create_time` datetime DEFAULT NULL,
+  `create_user` varchar(100) CHARACTER SET utf8 DEFAULT NULL COMMENT 'xh',
+  `update_user` varchar(100) CHARACTER SET utf8 DEFAULT NULL,
+  `max_num` bigint(20) DEFAULT NULL COMMENT '最大数字',
+  `min_num` int(11) DEFAULT '1' COMMENT '最小数字',
+  PRIMARY KEY (`code`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- ----------------------------
+-- Records of auto_id_bean
+-- ----------------------------
+INSERT INTO `auto_id_bean` VALUES ('key', null, 'springbootdemo', '2', '2018-11-27 16:10:05', '2018-09-06 15:25:43', null, 'xh', '100000', '1');
+
+-- ----------------------------
 -- Table structure for pub_file
 -- ----------------------------
 DROP TABLE IF EXISTS `pub_file`;
@@ -93,6 +116,8 @@ CREATE TABLE `pub_file` (
 -- ----------------------------
 INSERT INTO `pub_file` VALUES ('001', '趣味打击乐--垃圾桶齐奏.mp4', null, null, 'mp4', null, 'D:\\download\\lajitongqizou.mp4', 'Y', null, null, null, null);
 INSERT INTO `pub_file` VALUES ('002', 'test.jpg', null, null, null, null, 'D:\\download\\test.jpg', 'Y', null, null, null, null);
+INSERT INTO `pub_file` VALUES ('12aa761ccf7b49ce962cc3c875910682', '5a5fffa2a7a6a.jpg', null, null, '.jpg', null, 'D://testFileUpload//bb827bb1-b2f3-4e6c-ae7a-ff8ec99e544e.jpg', 'Y', '00000000000000000000000000000000', '2018-09-14 16:46:44', '00000000000000000000000000000000', '2018-09-14 16:46:44');
+INSERT INTO `pub_file` VALUES ('a37d7ebd55f94ef0aca103dce120597f', '5a5fffa2a7a6a.jpg', null, null, '.jpg', null, 'D://testFileUpload//739e6ea8-243e-41ae-a285-6354024c4f27.jpg', 'Y', '00000000000000000000000000000000', '2018-09-14 16:47:54', '00000000000000000000000000000000', '2018-09-14 16:47:54');
 
 -- ----------------------------
 -- Table structure for sys_cfg
@@ -159,6 +184,28 @@ INSERT INTO `sys_dict` VALUES ('dict005', 'userRole', '用户角色', '3', '城�
 INSERT INTO `sys_dict` VALUES ('dict006', 'userRole', '用户角色', '4', '普通用户', null, '4', 'Y', '00000000000000000000000000000000', '2018-08-15 15:59:34', null, null);
 
 -- ----------------------------
+-- Table structure for sys_html
+-- ----------------------------
+DROP TABLE IF EXISTS `sys_html`;
+CREATE TABLE `sys_html` (
+  `guid` varchar(50) NOT NULL,
+  `name` varchar(255) DEFAULT NULL COMMENT '政策名称',
+  `content` longtext COMMENT '政策内容详情页（html内容）',
+  `url` varchar(255) DEFAULT NULL COMMENT '跳转详情页url',
+  `record_state` varchar(1) DEFAULT NULL,
+  `create_user_id` varchar(50) DEFAULT NULL,
+  `create_time` datetime DEFAULT NULL,
+  `update_user_id` varchar(50) DEFAULT NULL,
+  `update_time` datetime DEFAULT NULL,
+  PRIMARY KEY (`guid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='自动生成html';
+
+-- ----------------------------
+-- Records of sys_html
+-- ----------------------------
+INSERT INTO `sys_html` VALUES ('381e1ed5e94044f9ba04a25d83b42936', '1111111', '222222222', '/static/savehtml/key000001.html', 'Y', '00000000000000000000000000000000', '2018-11-27 16:10:05', null, null);
+
+-- ----------------------------
 -- Table structure for sys_log
 -- ----------------------------
 DROP TABLE IF EXISTS `sys_log`;
@@ -179,6 +226,7 @@ CREATE TABLE `sys_log` (
 -- ----------------------------
 -- Records of sys_log
 -- ----------------------------
+INSERT INTO `sys_log` VALUES ('b27e27c4a0e54bcbb4aa5751f5320ac5', 'DESKTOP-2UCPARJ/192.168.1.136', '0:0:0:0:0:0:0:1', 'login', '登录', 'Y', '00000000000000000000000000000000', '2018-11-29 18:10:37', '00000000000000000000000000000000', '2018-11-29 18:10:37');
 
 -- ----------------------------
 -- Table structure for sys_menu

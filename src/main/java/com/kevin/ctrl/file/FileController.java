@@ -44,7 +44,7 @@ public class FileController {
     private IUploadFileService uploadFileService;
 
     @ApiOperation(value = "单个附件上传", notes = "单个附件上传", code = 200, produces = "application/json")
-    @RequestMapping(value = "/upload", method = RequestMethod.POST)
+    @RequestMapping(value = "/upload")
     public String upload( @RequestParam(name = "file", required = false) MultipartFile file) {
         if (file.isEmpty()) {
             return "文件为空";
@@ -76,7 +76,7 @@ public class FileController {
     }
 
     @ApiOperation(value = "多个附件上传", notes = "多个附件上传", code = 200, produces = "application/json")
-    @RequestMapping(value = "/batchUpload", method = RequestMethod.POST)
+    @RequestMapping(value = "/batchUpload")
     public String batchUpload(HttpServletRequest request) {
         List<MultipartFile> files = ((MultipartHttpServletRequest) request).getFiles("file");
         MultipartFile file = null;

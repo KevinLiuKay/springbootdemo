@@ -19,6 +19,7 @@ import java.util.List;
 @Service
 @Transactional
 public class SysHtmlServiceImpl implements ISysHtmlService {
+
     @Value("${TEST_HTML_TEMPLATE_URL}")
     private String testHtmlTemplateUrl = "/springbootdemo/static/template/wx_template"; //html模板
 
@@ -51,6 +52,9 @@ public class SysHtmlServiceImpl implements ISysHtmlService {
 
     @Override
     public SysHtml getById(String id) {
+        if(StringUtils.isNotBlank(id)){
+            return sysHtmlMapper.selectByPrimaryKey(id);
+        }
         return null;
     }
 
@@ -81,18 +85,32 @@ public class SysHtmlServiceImpl implements ISysHtmlService {
             fileinputstream.read(bytes);
             fileinputstream.close();
             String templateContent = new String(bytes);
-            templateContent = templateContent.replaceAll("###title###", title);
-            templateContent = templateContent.replaceAll("###content###", content);
-            String pathUrl = string2File(templateContent, uploadHtmlUrl + sequence.getSequenceStr("key") + ".html");
-            sysHtml.setUrl(pathUrl.substring(pathUrl.indexOf("static")-1));
-
             // 新增or编辑
             if(StringUtils.isNotBlank(guid)){
+                SysHtml html = getById(guid);
+                if(html != null){
+                    if(StringUtils.isNotBlank(html.getUrl())){
+                        deleteFile(html.getUrl());
+                        templateContent = templateContent.replaceAll("###title###", title);
+                        templateContent = templateContent.replaceAll("###content###", content);
+                        String pathUrl = string2File(templateContent, uploadHtmlUrl + html.getUrl().substring(html.getUrl().lastIndexOf("/") + 1));
+                        sysHtml.setUrl(pathUrl.substring(pathUrl.indexOf("static")-1));
+                    }else{
+                        templateContent = templateContent.replaceAll("###title###", title);
+                        templateContent = templateContent.replaceAll("###content###", content);
+                        String pathUrl = string2File(templateContent, uploadHtmlUrl + sequence.getSequenceStr("key") + ".html");
+                        sysHtml.setUrl(pathUrl.substring(pathUrl.indexOf("static")-1));
+                    }
+                }
                 sysHtml.setGuid(guid);
                 sysHtml.setUpdateUserId(userId);
                 sysHtml.setUpdateTime(Calendar.getInstance().getTime());
                 throwException(sysHtmlMapper.updateByPrimaryKeyWithBLOBs(sysHtml),"更新html失败");
             }else{
+                templateContent = templateContent.replaceAll("###title###", title);
+                templateContent = templateContent.replaceAll("###content###", content);
+                String pathUrl = string2File(templateContent, uploadHtmlUrl + sequence.getSequenceStr("key") + ".html");
+                sysHtml.setUrl(pathUrl.substring(pathUrl.indexOf("static")-1));
                 sysHtml.setGuid(UUIDUtil.getUUID());
                 sysHtml.setCreateUserId(userId);
                 sysHtml.setCreateTime(Calendar.getInstance().getTime());
@@ -142,6 +160,24 @@ public class SysHtmlServiceImpl implements ISysHtmlService {
         }
         return filePath;
     }
+
+    public static boolean deleteFile(String fileName) {
+        File file = new File(fileName);
+        // 如果文件路径所对应的文件存在，并且是一个文件，则直接删除
+        if (file.exists() && file.isFile()) {
+            if (file.delete()) {
+                System.out.println("删除单个文件" + fileName + "成功！");
+                return true;
+            } else {
+                System.out.println("删除单个文件" + fileName + "失败！");
+                return false;
+            }
+        } else {
+            System.out.println("删除单个文件失败：" + fileName + "不存在！");
+            return false;
+        }
+    }
+
     public void throwException(int result,String name){
         if (result == 0) {
             throw new RuntimeException(name);
